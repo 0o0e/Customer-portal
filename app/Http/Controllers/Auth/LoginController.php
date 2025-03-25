@@ -10,6 +10,9 @@ class LoginController extends Controller
 {
     public function showLoginForm()
     {
+        if (Auth::check()) {
+            return redirect()->route('dashboard'); // Redirect logged-in users to dashboard
+        }
         return view('auth.login');
     }
 
@@ -22,7 +25,7 @@ class LoginController extends Controller
         ]);
 
         if (Auth::attempt($credentials)) {
-            return redirect()->intended('/customer/dashboard'); // Redirect to dashboard
+            return redirect()->intended('/dashboard');
         }
 
         return back()->withErrors(['login' => 'Invalid login details']);
