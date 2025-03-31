@@ -2,33 +2,30 @@
 
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-
+use App\Models\Catalog;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-
-    public function index() {
+    public function index(Request $request)
+    {
         $user = Auth::user();
+        $catalog = new Catalog();
         
-        $query = DB::table('catalog')
-            ->where('MAIN CUSTOMER', $user->No)
-            ->select('Item Description', 'Item Catalog', 'Description', 'Sales Unit of Measure', 'Valid from Date', 'Valid to Date');
+        $products = $catalog->where('MAIN CUSTOMER', $user->No)
+            ->select('Item Description', 'Item Catalog', 'Description', 'Sales Unit of Measure', 'Valid from Date', 'Valid to Date')
+            ->get();
+            
+        $hasProducts = !$products->isEmpty();
 
         // Apply search filter if search term exists in session
-        if (session()->has('search') && session('search') != '') {
+        if (session()->has('search')) {
             $searchTerm = session('search');
-            $query->where(function($q) use ($searchTerm) {
-                $q->where('Item Description', 'like', '%' . $searchTerm . '%')
-                  ->orWhere('Item Catalog', 'like', '%' . $searchTerm . '%')
-                  ->orWhere('Description', 'like', '%' . $searchTerm . '%')
-                  ->orWhere('Sales Unit of Measure', 'like', '%' . $searchTerm . '%');
+            $products = $products->filter(function($product) use ($searchTerm) {
+                return stripos($product->{'Item Description'}, $searchTerm) !== false ||
+                       stripos($product->{'Item Catalog'}, $searchTerm) !== false;
             });
         }
-
-        $products = $query->get();
-        $hasProducts = !$products->isEmpty();
 
         $allProducts = $products->map(function($product){
             return [
@@ -43,7 +40,8 @@ class ProductController extends Controller
         return view('products', compact('hasProducts', 'allProducts'));
     }
 
-    public function search(Request $request) {
+    public function search(Request $request)
+    {
         $request->validate([
             'search' => 'nullable|string|max:255'
         ]);
@@ -51,6 +49,5 @@ class ProductController extends Controller
         session(['search' => $request->search]);
         return redirect()->route('products.index');
     }
-    
 }
 

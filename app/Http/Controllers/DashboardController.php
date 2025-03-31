@@ -11,17 +11,21 @@ class DashboardController extends Controller
     public function index()
     {
         $user = Auth::user();
-        // Retrieve the currently authenticated user
+        
+        // Get related customers from catalog table
+        $relatedCustomers = DB::table('catalog')
+            ->where('MAIN CUSTOMER', $user->No)
+            ->select('Customer No#')
+            ->distinct()
+            ->get();
 
-        // Pass the data to the view
-            $products = DB::table('catalog')
-        ->where('MAIN CUSTOMER', $user->No)
-        ->select('Item Description', 'Item Catalog', 'Description', 'Sales Unit of Measure', 'Valid from Date', 'Valid to Date')
-        ->get();
+        // Get products for the current user
+        $products = DB::table('catalog')
+            ->where('MAIN CUSTOMER', $user->No)
+            ->select('Item Description', 'Item Catalog', 'Description', 'Sales Unit of Measure', 'Valid from Date', 'Valid to Date')
+            ->get();
 
-        return view('dashboard', compact('products'));
-
-        // return view('dashboard', compact('user'));
+        return view('dashboard', compact('products', 'relatedCustomers'));
     }
 
 }
