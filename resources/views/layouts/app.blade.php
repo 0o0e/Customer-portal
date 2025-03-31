@@ -4,233 +4,248 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Dashboard') - Özgazi</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body {
-            font-family: 'Poppins', sans-serif;
+        * {
             margin: 0;
             padding: 0;
-            background-color: #f4f6f8;
+            box-sizing: border-box;
         }
 
-        /* Navbar */
-        .navbar {
-            background-color: #333;
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f8fafc;
+            min-height: 100vh;
+            color: #1e293b;
+        }
+
+        .page-container {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 20px;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: #1e293b;
+            padding: 2rem;
+            color: white;
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
+            height: 100vh;
+            overflow-y: auto;
         }
 
-        .nav-links {
-            display: flex;
-            gap: 15px;
-        }
-
-        .nav-links a, .logout-btn {
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
             color: white;
             text-decoration: none;
-            padding: 10px 15px;
-            transition: background-color 0.3s;
-        }
-
-        .nav-links a:hover, .logout-btn:hover {
-            background-color: #d32f2f;
-            border-radius: 5px;
-        }
-
-        .hamburger {
-            display: none;
-            cursor: pointer;
-            padding: 10px;
-        }
-
-        .hamburger span {
-            display: block;
-            width: 25px;
-            height: 3px;
-            background-color: white;
-            margin: 5px 0;
-            transition: all 0.3s ease;
-        }
-
-        /* Main Content */
-        .content {
-            padding: 40px;
-            margin-top: 80px;
-        }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f6f8;
-        }
-
-        /* Top Navigation Bar */
-        .navbar {
-            background-color: #333;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 20px;
-            box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            transition: transform 0.3s ease-in-out;
-        }
-
-        .navbar.hidden {
-            transform: translateY(-100%);
         }
 
         .nav-links {
-            display: flex;
-            gap: 15px;
-            margin: 0;
-            padding: 0;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-bottom: 0.5rem;
         }
 
         .nav-links a {
-            color: white;
+            color: #94a3b8;
             text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
-            padding: 10px 15px;
-            background-color: transparent;
-            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
         }
 
-        .nav-links a:hover {
-            background-color: #d32f2f;
-            border-radius: 5px;
+        .nav-links a:hover, .nav-links a.active {
+            background: #334155;
+            color: white;
         }
+
+        .nav-links i {
+            margin-right: 0.75rem;
+            width: 20px;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 1.875rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: #e2e8f0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 500;
+            color: #1e293b;
+        }
+
+        .user-role {
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+
 
         .logout-btn {
-            color: white;
+            color: #94a3b8;
             text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
-            padding: 10px 15px;
-            background-color: transparent;
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            background: none;
             border: none;
             cursor: pointer;
-            transition: background-color 0.3s;
+            width: 100%;
+            text-align: left;
         }
 
         .logout-btn:hover {
-            background-color: #d32f2f;
-            border-radius: 5px;
+            background: #334155;
+            color: white;
         }
 
-        /* Main Content */
-        .main-content {
-            padding: 40px;
-            text-align: center;
-            margin-top: 80px;
+        .logout-btn i {
+            margin-right: 0.75rem;
+            width: 20px;
         }
 
-        .welcome-header h1 {
-            font-size: 24px;
-            color: #333;
-        }
-
-        .stats-container {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 30px;
-        }
-
-        /* Box Style for Orders, Invoices, Products */
-        .dashboard-box {
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            width: 200px;
-            height: 200px;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-        }
-
-        .dashboard-box:hover {
-            transform: scale(1.05);
-            background-color: #f1f1f1;
-        }
-
-        .dashboard-box h3 {
-            font-size: 20px;
-            color: #333;
-        }
-
-        .dashboard-box p {
-            font-size: 14px;
-            color: #777;
-        }
-
-        /* Responsive Design */
         @media (max-width: 768px) {
-            .navbar {
-                flex-direction: row;
-                justify-content: space-between;
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 1000;
             }
 
-            .nav-links {
-                flex-direction: column;
-                gap: 10px;
-                margin-top: 10px;
+            .sidebar {
+                padding-top: 60px;
+            }
+            .sidebar.active {
+                transform: translateX(0);
             }
 
-            .nav-links a {
-                padding: 12px 0;
+            .main-content {
+                margin-left: 0;
             }
 
-            .logout-btn {
-                margin-top: 10px;
-                padding: 12px 0;
+            .hamburger {
+                display: block;
+                position: fixed;
+                top: 1rem;
+                left: 1rem;
+                z-index: 1001;
+                background: #1e293b;
+                padding: 0.5rem;
+                border-radius: 0.5rem;
+                cursor: pointer;
             }
 
-            .stats-container {
-                flex-direction: column;
-            }
-
-            .dashboard-box {
-                width: 100%;
-                margin-bottom: 20px;
+            .hamburger span {
+                display: block;
+                width: 25px;
+                height: 3px;
+                background-color: white;
+                margin: 5px 0;
+                transition: all 0.3s ease;
             }
         }
-
     </style>
 </head>
 <body>
-
-    <!-- Navbar -->
-    <div class="navbar">
-        <div class="nav-links">
-            <a href="/dashboard">Dashboard</a>
-            <a href="/orders">Orders</a>
-            <a href="/products">Products</a>
+    <div class="page-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <a href="/dashboard" class="logo">Özgazi</a>
+            <ul class="nav-links">
+                <li>
+                    <a href="/dashboard" class="{{ request()->is('dashboard') ? 'active' : '' }}">
+                        <i class="fas fa-home"></i>
+                        Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="/orders" class="{{ request()->is('orders') ? 'active' : '' }}">
+                        <i class="fas fa-shopping-cart"></i>
+                        Orders
+                    </a>
+                </li>
+                <li>
+                    <a href="/products" class="{{ request()->is('products') ? 'active' : '' }}">
+                        <i class="fas fa-box"></i>
+                        Products
+                    </a>
+                </li>
+                <li>
+                    <a href="/profile" class="{{ request()->is('profile') ? 'active' : '' }}">
+                        <i class="fas fa-user"></i>
+                        Profile
+                    </a>
+                </li>
+            </ul>
+            <form action="{{ route('logout') }}" method="POST">
+                @csrf
+                <button type="submit" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </button>
+            </form>
         </div>
-        <form action="{{ route('logout') }}" method="POST">
-            @csrf
-            <button type="submit" class="logout-btn">Logout</button>
-        </form>
+
+        <!-- Main Content -->
+        <div class="main-content">
+
+            @yield('content')
+        </div>
     </div>
 
-    <!-- Main content -->
-    <div class="content">
-        @yield('content')
+    <div class="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
     </div>
 
+    <script>
+        document.querySelector('.hamburger').addEventListener('click', function() {
+            document.querySelector('.sidebar').classList.toggle('active');
+        });
+    </script>
 </body>
 </html>

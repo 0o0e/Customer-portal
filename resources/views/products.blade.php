@@ -1,4 +1,8 @@
 @extends('layouts.app')
+
+@section('title', 'All Products')
+
+@section('content')
 <style>
     .products-container {
         background-color: #ffffff;
@@ -12,19 +16,19 @@
 
     .products-container h1 {
         font-size: 28px;
-        color: #333;
+        color: #1e293b;
         margin-bottom: 30px;
         font-weight: 600;
         text-align: center;
     }
 
     .no-products-message {
-        background-color: #fce4e4;
+        background-color: #fee2e2;
         padding: 20px;
         border-radius: 8px;
         margin-top: 30px;
         font-size: 18px;
-        color: #d32f2f;
+        color: #dc2626;
         box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.05);
         text-align: center;
     }
@@ -48,46 +52,23 @@
         padding: 15px;
         text-align: left;
         font-size: 14px;
-        color: #555;
-        border-bottom: 1px solid #eee;
+        color: #1e293b;
+        border-bottom: 1px solid #e2e8f0;
     }
 
     .products-table th {
-        background-color: #f8f9fa;
+        background-color: #f8fafc;
         font-weight: 600;
-        color: #333;
+        color: #1e293b;
         white-space: nowrap;
     }
 
     .products-table tbody tr:hover {
-        background-color: #f8f9fa;
+        background-color: #f8fafc;
     }
 
     .products-table td {
         background-color: #fff;
-    }
-
-    @media (max-width: 768px) {
-        .products-container {
-            padding: 20px;
-            margin: 10px auto;
-            width: 90%;
-        }
-
-        .products-container h1 {
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
-
-        .table-responsive {
-            margin: 0;
-            padding: 0;
-        }
-
-        .products-table th, .products-table td {
-            padding: 12px;
-            font-size: 13px;
-        }
     }
 
     .search-section {
@@ -103,21 +84,22 @@
         flex: 1;
         min-width: 300px;
         padding: 12px 20px;
-        border: 2px solid #e0e0e0;
+        border: 2px solid #e2e8f0;
         border-radius: 8px;
         font-size: 16px;
         transition: all 0.3s ease;
         outline: none;
+        background: #f8fafc;
     }
 
     .search-input:focus {
-        border-color: #4a90e2;
-        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+        border-color: #2f60d3;
+        box-shadow: 0 0 0 3px rgba(47, 96, 211, 0.1);
     }
 
     .search-button {
         padding: 12px 30px;
-        background-color: #4a90e2;
+        background-color: #2f60d3;
         color: white;
         border: none;
         border-radius: 8px;
@@ -128,88 +110,203 @@
     }
 
     .search-button:hover {
-        background-color: #357abd;
+        background-color: #1e4ba3;
         transform: translateY(-1px);
     }
 
     .search-button:active {
         transform: translateY(0);
     }
-</style>
 
-@section('title', 'All Products')
+    .product-card {
+        display: none;
+        background: white;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e2e8f0;
+    }
 
-@section('content')
-    <div class="products-container">
-        <h1>All Products</h1>
+    .product-card .field {
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
 
-        <div class="search-section">
-            <input type="text" class="search-input" id="searchInput" placeholder="Search products...">
-            <button class="search-button" onclick="filterProducts()">Search</button>
-        </div>
+    .product-card .field:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
 
-        @if($products->isEmpty())
-            <div class="no-products-message">
-                <p>No products found.</p>
-            </div>
-        @else
-            <div class="table-responsive">
-                <table class="products-table" id="productsTable">
-                    <thead>
-                        <tr>
-                            <th>Item Description</th>
-                            <th>Item Catalog</th>
-                            <th>Item Unit</th>
-                            <th>Valid From Date</th>
-                            <th>Valid To Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($products as $product)
-                        <tr>
-                            <td>{{ $product->{'Item Description'} }}</td>
-                            <td>{{ $product->{'Item Catalog'} }}</td>
-                            <td>{{ $product->{'Sales Unit of Measure'} }}</td>
-                            <td>{{ $product->{'Valid from Date'} }}</td>
-                            <td>{{ $product->{'Valid to Date'} }}</td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        @endif
-    </div>
+    .product-card .label {
+        font-weight: 500;
+        color: #64748b;
+        font-size: 0.875rem;
+        margin-bottom: 0.25rem;
+    }
 
-    <script>
-        function filterProducts() {
-            const searchInput = document.getElementById('searchInput');
-            const searchText = searchInput.value.toLowerCase();
-            const table = document.getElementById('productsTable');
-            const rows = table.getElementsByTagName('tr');
+    .product-card .value {
+        color: #1e293b;
+        font-size: 1rem;
+        font-weight: 500;
+    }
 
-            for (let i = 1; i < rows.length; i++) {
-                const row = rows[i];
-                const cells = row.getElementsByTagName('td');
-                let found = false;
-
-                for (let cell of cells) {
-                    const cellText = cell.textContent.toLowerCase();
-                    if (cellText.includes(searchText)) {
-                        found = true;
-                        break;
-                    }
-                }
-
-                row.style.display = found ? '' : 'none';
-            }
+    @media (max-width: 768px) {
+        .products-container {
+            padding: 0;
+            margin: 0;
+            width: 100%;
+            border-radius: 0;
+            background: none;
+            box-shadow: none;
         }
 
-        // Add event listener for Enter key
-        document.getElementById('searchInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                filterProducts();
+        .products-container h1 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            padding: 0 1rem;
+        }
+
+        .search-section {
+            flex-direction: column;
+            gap: 0.75rem;
+            padding: 0 1rem;
+        }
+
+        .search-input {
+            width: 100%;
+            min-width: unset;
+        }
+
+        .search-button {
+            width: 100%;
+            padding: 0.75rem 1rem;
+        }
+
+        .table-responsive {
+            display: none;
+        }
+
+        .product-card {
+            display: block;
+            padding: 1rem;
+            margin: 0.5rem 1rem;
+            border-radius: 0.75rem;
+        }
+
+        .mobile-products {
+            padding: 0.5rem 0;
+        }
+    }
+</style>
+
+<div class="products-container">
+    <h1>All Products</h1>
+
+    <div class="search-section">
+        <input type="text" class="search-input" id="searchInput" placeholder="Search products...">
+        <button class="search-button" onclick="filterProducts()">Search</button>
+    </div>
+
+    @if($products->isEmpty())
+        <div class="no-products-message">
+            <p>No products found.</p>
+        </div>
+    @else
+        <div class="table-responsive">
+            <table class="products-table" id="productsTable">
+                <thead>
+                    <tr>
+                        <th>Item Description</th>
+                        <th>Item Catalog</th>
+                        <th>Item Unit</th>
+                        <th>Valid From Date</th>
+                        <th>Valid To Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($products as $product)
+                    <tr>
+                        <td>{{ $product->{'Item Description'} }}</td>
+                        <td>{{ $product->{'Item Catalog'} }}</td>
+                        <td>{{ $product->{'Sales Unit of Measure'} }}</td>
+                        <td>{{ $product->{'Valid from Date'} }}</td>
+                        <td>{{ $product->{'Valid to Date'} }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mobile-products">
+            @foreach($products as $product)
+            <div class="product-card">
+                <div class="field">
+                    <div class="label">Item Description</div>
+                    <div class="value">{{ $product->{'Item Description'} }}</div>
+                </div>
+                <div class="field">
+                    <div class="label">Item Catalog</div>
+                    <div class="value">{{ $product->{'Item Catalog'} }}</div>
+                </div>
+                <div class="field">
+                    <div class="label">Item Unit</div>
+                    <div class="value">{{ $product->{'Sales Unit of Measure'} }}</div>
+                </div>
+                <div class="field">
+                    <div class="label">Valid From Date</div>
+                    <div class="value">{{ $product->{'Valid from Date'} }}</div>
+                </div>
+                <div class="field">
+                    <div class="label">Valid To Date</div>
+                    <div class="value">{{ $product->{'Valid to Date'} }}</div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+    @endif
+</div>
+
+<script>
+    function filterProducts() {
+        const searchInput = document.getElementById('searchInput');
+        const searchText = searchInput.value.toLowerCase();
+        const table = document.getElementById('productsTable');
+        const rows = table.getElementsByTagName('tr');
+        const cards = document.getElementsByClassName('product-card');
+
+        // Filter table rows
+        for (let i = 1; i < rows.length; i++) {
+            const row = rows[i];
+            const cells = row.getElementsByTagName('td');
+            let found = false;
+
+            for (let cell of cells) {
+                const cellText = cell.textContent.toLowerCase();
+                if (cellText.includes(searchText)) {
+                    found = true;
+                    break;
+                }
             }
-        });
-    </script>
+
+            row.style.display = found ? '' : 'none';
+        }
+
+        // Filter cards
+        for (let card of cards) {
+            const text = card.textContent.toLowerCase();
+            card.style.display = text.includes(searchText) ? '' : 'none';
+        }
+    }
+
+    // Add event listener for Enter key
+    document.getElementById('searchInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            filterProducts();
+        }
+    });
+</script>
 @endsection
 
