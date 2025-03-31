@@ -150,7 +150,7 @@
     .product-card .value {
         color: #1e293b;
         font-size: 1rem;
-        font-weight: 500;
+        font-weight: 
     }
 
     @media (max-width: 768px) {
@@ -199,6 +199,14 @@
         .mobile-products {
             padding: 0.5rem 0;
         }
+        .search-form {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        width: 100%;
+    }
     }
 </style>
 
@@ -206,11 +214,14 @@
     <h1>All Products</h1>
 
     <div class="search-section">
-        <input type="text" class="search-input" id="searchInput" placeholder="Search products...">
-        <button class="search-button" onclick="filterProducts()">Search</button>
+        <form id="searchForm" method="POST" action="{{ route('products.search') }}" class="search-form">
+            @csrf
+            <input type="text" class="search-input" name="search" value="{{ session('search') }}" placeholder="Search products...">
+            <button type="submit" class="search-button">Search</button>
+        </form>
     </div>
 
-    @if($products->isEmpty())
+    @if(!$hasProducts)
         <div class="no-products-message">
             <p>No products found.</p>
         </div>
@@ -227,13 +238,13 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($products as $product)
+                    @foreach($allProducts as $product)
                     <tr>
-                        <td>{{ $product->{'Item Description'} }}</td>
-                        <td>{{ $product->{'Item Catalog'} }}</td>
-                        <td>{{ $product->{'Sales Unit of Measure'} }}</td>
-                        <td>{{ $product->{'Valid from Date'} }}</td>
-                        <td>{{ $product->{'Valid to Date'} }}</td>
+                        <td>{{ $product['Description'] }}</td>
+                        <td>{{ $product['Catalog'] }}</td>
+                        <td>{{ $product['Unit'] }}</td>
+                        <td>{{ $product['Valid from Date'] }}</td>
+                        <td>{{ $product['Valid to Date'] }}</td>
                     </tr>
                     @endforeach
                 </tbody>
@@ -241,27 +252,27 @@
         </div>
 
         <div class="mobile-products">
-            @foreach($products as $product)
+            @foreach($allProducts as $product)
             <div class="product-card">
                 <div class="field">
                     <div class="label">Item Description</div>
-                    <div class="value">{{ $product->{'Item Description'} }}</div>
+                    <div class="value">{{ $product['Description'] }}</div>
                 </div>
                 <div class="field">
                     <div class="label">Item Catalog</div>
-                    <div class="value">{{ $product->{'Item Catalog'} }}</div>
+                    <div class="value">{{ $product['Catalog'] }}</div>
                 </div>
                 <div class="field">
                     <div class="label">Item Unit</div>
-                    <div class="value">{{ $product->{'Sales Unit of Measure'} }}</div>
+                    <div class="value">{{ $product['Unit'] }}</div>
                 </div>
                 <div class="field">
                     <div class="label">Valid From Date</div>
-                    <div class="value">{{ $product->{'Valid from Date'} }}</div>
+                    <div class="value">{{ $product['Valid from Date'] }}</div>
                 </div>
                 <div class="field">
                     <div class="label">Valid To Date</div>
-                    <div class="value">{{ $product->{'Valid to Date'} }}</div>
+                    <div class="value">{{ $product['Valid to Date'] }}</div>
                 </div>
             </div>
             @endforeach
@@ -270,42 +281,9 @@
 </div>
 
 <script>
-    function filterProducts() {
-        const searchInput = document.getElementById('searchInput');
-        const searchText = searchInput.value.toLowerCase();
-        const table = document.getElementById('productsTable');
-        const rows = table.getElementsByTagName('tr');
-        const cards = document.getElementsByClassName('product-card');
-
-        // Filter table rows
-        for (let i = 1; i < rows.length; i++) {
-            const row = rows[i];
-            const cells = row.getElementsByTagName('td');
-            let found = false;
-
-            for (let cell of cells) {
-                const cellText = cell.textContent.toLowerCase();
-                if (cellText.includes(searchText)) {
-                    found = true;
-                    break;
-                }
-            }
-
-            row.style.display = found ? '' : 'none';
-        }
-
-        // Filter cards
-        for (let card of cards) {
-            const text = card.textContent.toLowerCase();
-            card.style.display = text.includes(searchText) ? '' : 'none';
-        }
-    }
-
-    // Add event listener for Enter key
-    document.getElementById('searchInput').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            filterProducts();
-        }
+    document.getElementById('searchForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        this.submit();
     });
 </script>
 @endsection

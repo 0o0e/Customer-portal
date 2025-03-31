@@ -43,6 +43,7 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+    Route::post('/products/search', [ProductController::class, 'search'])->name('products.search');
 
     // Profile routes
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
