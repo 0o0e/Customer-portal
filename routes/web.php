@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\OrderController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -41,9 +42,11 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+    Route::match(['get', 'post'], '/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::match(['get', 'post'], '/products', [ProductController::class, 'index'])->name('products.index');
     Route::post('/products/search', [ProductController::class, 'search'])->name('products.search');
+    Route::post('/products/update-clients', [ProductController::class, 'updateClients'])->name('products.update-clients');
+    Route::match(['get', 'post'], '/profile', [ProfileController::class, 'show'])->name('profile.index');
 
     // Profile routes
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
