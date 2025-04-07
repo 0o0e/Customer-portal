@@ -292,6 +292,75 @@
         .user-dropdown-content::-webkit-scrollbar-thumb:hover {
             background: rgba(255, 255, 255, 0.3);
         }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            width: 100%;
+            user-select: none;
+        }
+
+        .checkbox-container input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
+        .checkmark {
+            position: relative;
+            height: 18px;
+            width: 18px;
+            background-color: #334155;
+            border-radius: 3px;
+            margin-right: 10px;
+        }
+
+        .checkbox-container:hover input ~ .checkmark {
+            background-color: #475569;
+        }
+
+        .checkbox-container input:checked ~ .checkmark {
+            background-color: #2f60d3;
+        }
+
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+            left: 6px;
+            top: 2px;
+            width: 4px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        .checkbox-container input:checked ~ .checkmark:after {
+            display: block;
+        }
+
+        .apply-filter-btn {
+            background: #2f60d3;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: background-color 0.3s;
+        }
+
+        .apply-filter-btn:hover {
+            background: #1e4ba3;
+        }
     </style>
 </head>
 <body>
@@ -314,12 +383,25 @@
                     </div>
                     <div class="user-dropdown-content">
                         @if(isset($relatedCustomers) && $relatedCustomers->count() > 0)
-                            @foreach($relatedCustomers as $customer)
+                            <form method="POST" action="{{ url()->current() }}">
+                                @csrf
+                                @foreach($relatedCustomers as $customer)
+                                    <div class="user-dropdown-item">
+                                        <label class="checkbox-container">
+                                            <input type="checkbox" name="selected_clients[]" value="{{ $customer->{'Customer No#'} }}" 
+                                                {{ in_array($customer->{'Customer No#'}, session('selected_clients', [Auth::user()->No])) ? 'checked' : '' }}>
+                                            <span class="checkmark"></span>
+                                            Customer #{{ $customer->{'Customer No#'} }}
+                                        </label>
+                                    </div>
+                                @endforeach
                                 <div class="user-dropdown-item">
-                                    <i class="fas fa-building"></i>
-                                    Customer #{{ $customer->{'Customer No#'} }}
+                                    <button type="submit" class="apply-filter-btn">
+                                        <i class="fas fa-check"></i>
+                                        Apply Filter
+                                    </button>
                                 </div>
-                            @endforeach
+                            </form>
                         @else
                             <div class="no-customers">
                                 No related customers found
@@ -394,6 +476,42 @@
             if (!e.target.closest('.user-dropdown')) {
                 document.querySelector('.user-dropdown').classList.remove('active');
             }
+        });
+
+        // Handle checkbox clicks
+        document.querySelectorAll('.checkbox-container').forEach(container => {
+            container.addEventListener('click', function(e) {
+                if (e.target !== this.querySelector('input')) {
+                    e.preventDefault();
+                    const checkbox = this.querySelector('input');
+                    checkbox.checked = !checkbox.checked;
+                }
+            });
+        });
+
+        // Handle form submission with AJAX
+        document.getElementById('clientFilterForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            fetch('{{ route("products.update-clients") }}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Close the dropdown
+                    document.querySelector('.user-dropdown').classList.remove('active');
+                    // Reload the page to show updated data
+                    window.location.reload();
+                }
+            })
+            .catch(error => console.error('Error:', error));
         });
     </script>
 </body>
