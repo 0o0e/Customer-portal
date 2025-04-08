@@ -59,6 +59,9 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
 });
 
 // Register the admin middleware
