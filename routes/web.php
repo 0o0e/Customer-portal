@@ -46,6 +46,8 @@ Route::middleware('auth')->group(function () {
     Route::match(['get', 'post'], '/products', [ProductController::class, 'index'])->name('products.index');
     Route::post('/products/search', [ProductController::class, 'search'])->name('products.search');
     Route::post('/products/update-clients', [ProductController::class, 'updateClients'])->name('products.update-clients');
+    Route::post('/orders/update-clients', [OrderController::class, 'updateClients'])->name('orders.update-clients');
+
     Route::match(['get', 'post'], '/profile', [ProfileController::class, 'show'])->name('profile.index');
 
     // Profile routes
@@ -59,6 +61,10 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::post('/orders', [OrderController::class, 'index']);
+    Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
 });
 
 // Register the admin middleware

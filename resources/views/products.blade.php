@@ -153,6 +153,167 @@
         font-weight: 
     }
 
+    .search-form {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .client-filter {
+        position: relative;
+        min-width: 200px;
+        z-index: 100;
+    }
+
+    .client-filter-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 20px;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        background: #f8fafc;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 200px;
+        justify-content: space-between;
+    }
+
+    .client-filter-header:hover {
+        border-color: #2f60d3;
+        background: #f1f5f9;
+    }
+
+    .client-filter-header i {
+        margin-left: auto;
+        transition: transform 0.3s;
+    }
+
+    .client-filter.active .client-filter-header i {
+        transform: rotate(180deg);
+    }
+
+    .client-filter-content {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        margin-top: 5px;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        max-height: 300px;
+        overflow-y: auto;
+        width: 250px;
+    }
+
+    .client-filter.active .client-filter-content {
+        display: block;
+    }
+
+    .client-filter-item {
+        padding: 10px 15px;
+        border-bottom: 1px solid #e2e8f0;
+        transition: background 0.3s ease;
+    }
+
+    .client-filter-item:hover {
+        background: #f8fafc;
+    }
+
+    .client-filter-item:last-child {
+        border-bottom: none;
+    }
+
+    .checkbox-container {
+        display: flex;
+        align-items: center;
+        position: relative;
+        padding-left: 35px;
+        margin-bottom: 0;
+        cursor: pointer;
+        font-size: 14px;
+        user-select: none;
+        width: 100%;
+    }
+
+    .checkbox-container input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+        height: 0;
+        width: 0;
+    }
+
+    .checkmark {
+        position: absolute;
+        left: 0;
+        height: 20px;
+        width: 20px;
+        background-color: #fff;
+        border: 2px solid #e2e8f0;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+    }
+
+    .checkbox-container:hover input ~ .checkmark {
+        border-color: #2f60d3;
+    }
+
+    .checkbox-container input:checked ~ .checkmark {
+        background-color: #2f60d3;
+        border-color: #2f60d3;
+    }
+
+    .checkmark:after {
+        content: "";
+        position: absolute;
+        display: none;
+        left: 6px;
+        top: 2px;
+        width: 5px;
+        height: 10px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+    }
+
+    .checkbox-container input:checked ~ .checkmark:after {
+        display: block;
+    }
+
+    .client-label {
+        margin-left: 15px;
+        color: #1e293b;
+    }
+
+    .apply-filter-btn {
+        width: 100%;
+        padding: 10px;
+        background: #2f60d3;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.3s;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .apply-filter-btn:hover {
+        background: #1e4ba3;
+    }
+
+    .apply-filter-btn i {
+        font-size: 12px;
+    }
+
     @media (max-width: 768px) {
         .products-container {
             padding: 0;
@@ -199,14 +360,10 @@
         .mobile-products {
             padding: 0.5rem 0;
         }
-        .search-form {
-        display: flex;
-        gap: 15px;
-        align-items: center;
-        justify-content: center;
-        flex-wrap: wrap;
-        width: 100%;
-    }
+
+        .client-filter {
+            width: 100%;
+        }
     }
 </style>
 
@@ -219,7 +376,42 @@
             <input type="text" class="search-input" name="search" value="{{ session('search') }}" placeholder="Search products...">
             <button type="submit" class="search-button">Search</button>
         </form>
+        
+        <div class="client-filter">
+            <div class="client-filter-header">
+                <span>Filter by Client</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="client-filter-content">
+                <form id="clientFilterForm" method="POST" action="{{ route('products.update-clients') }}">
+                    @csrf
+                    @if(isset($relatedCustomers) && $relatedCustomers->count() > 0)
+                        @foreach($relatedCustomers as $customer)
+                            <div class="client-filter-item">
+                                <label class="checkbox-container">
+                                    <input type="checkbox" name="selected_clients[]" value="{{ $customer->{'Customer No#'} }}" 
+                                        {{ in_array($customer->{'Customer No#'}, session('selected_clients', [Auth::user()->No])) ? 'checked' : '' }}>
+                                    <span class="checkmark"></span>
+                                    <span class="client-label">Client #{{ $customer->{'Customer No#'} }}</span>
+                                </label>
+                            </div>
+                        @endforeach
+                        <div class="client-filter-item">
+                            <button type="submit" class="apply-filter-btn">
+                                <i class="fas fa-check"></i>
+                                Apply Filters
+                            </button>
+                        </div>
+                    @else
+                        <div class="client-filter-item">
+                            No related customers found
+                        </div>
+                    @endif
+                </form>
+            </div>
+        </div>
     </div>
+    
 
     @if(!$hasProducts)
         <div class="no-products-message">
@@ -281,9 +473,137 @@
 </div>
 
 <script>
-    document.getElementById('searchForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        this.submit();
+    // Debug info
+    console.log("Client filter initialization starting...");
+    
+    // Check if elements exist
+    const clientFilterHeader = document.querySelector('.client-filter-header');
+    const clientFilterContent = document.querySelector('.client-filter-content');
+    const clientFilterForm = document.getElementById('clientFilterForm');
+    
+    if (!clientFilterHeader) {
+        console.error("Client filter header not found!");
+    }
+    
+    if (!clientFilterContent) {
+        console.error("Client filter content not found!");
+    }
+    
+    if (!clientFilterForm) {
+        console.error("Client filter form not found!");
+    }
+    
+    // Add client filter dropdown functionality
+    if (clientFilterHeader) {
+        console.log("Adding click event to client filter header");
+        clientFilterHeader.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const clientFilter = document.querySelector('.client-filter');
+            clientFilter.classList.toggle('active');
+            console.log("Client filter toggled:", clientFilter.classList.contains('active'));
+        });
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        const clientFilter = document.querySelector('.client-filter');
+        if (clientFilter && !e.target.closest('.client-filter')) {
+            clientFilter.classList.remove('active');
+            console.log("Client filter closed by outside click");
+        }
+    });
+
+    // Prevent dropdown from closing when clicking inside
+    if (clientFilterContent) {
+        clientFilterContent.addEventListener('click', function(e) {
+            e.stopPropagation();
+            console.log("Click inside client filter content detected");
+        });
+    }
+
+    // Handle client filter form submission
+    if (clientFilterForm) {
+        console.log("Adding submit event to client filter form");
+        clientFilterForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            console.log("Client filter form submitted");
+            
+            const formData = new FormData(this);
+            // Debug selected checkboxes
+            const selectedClients = [];
+            formData.getAll('selected_clients[]').forEach(client => {
+                selectedClients.push(client);
+            });
+            console.log("Selected clients:", selectedClients);
+            
+            // Add the CSRF token from meta tag if it's not already in the form
+            if (!formData.has('_token')) {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]');
+                if (csrfToken) {
+                    formData.append('_token', csrfToken.content);
+                } else {
+                    console.error("CSRF token not found!");
+                }
+            }
+            
+            fetch('{{ route("products.update-clients") }}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => {
+                console.log("Response status:", response.status);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Response data:", data);
+                if (data.success) {
+                    console.log("Client filter applied successfully, reloading page");
+                    window.location.reload();
+                } else {
+                    console.error("Server returned success:false", data);
+                    alert("Error applying filter. Please try again.");
+                }
+            })
+            .catch(error => {
+                console.error("Error applying client filter:", error);
+                alert("Error applying filter: " + error.message);
+            });
+        });
+    }
+
+    // Search form submission
+    const searchForm = document.getElementById('searchForm');
+    if (searchForm) {
+        searchForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            this.submit();
+        });
+    } else {
+        console.error("Search form not found!");
+    }
+    
+    // Make sure all checkboxes are clickable
+    const checkboxContainers = document.querySelectorAll('.checkbox-container');
+    console.log("Found " + checkboxContainers.length + " checkbox containers");
+    
+    checkboxContainers.forEach(container => {
+        const checkbox = container.querySelector('input[type="checkbox"]');
+        const label = container.querySelector('.client-label');
+        
+        if (checkbox && label) {
+            label.addEventListener('click', function(e) {
+                e.preventDefault();
+                checkbox.checked = !checkbox.checked;
+                console.log("Checkbox toggled via label:", checkbox.checked);
+            });
+        }
     });
 </script>
 @endsection
