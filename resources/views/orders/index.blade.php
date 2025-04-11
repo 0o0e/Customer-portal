@@ -242,4 +242,10 @@
         </div>
     @endif
 </div>
+<script>
+    document.getElementById('searchForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        this.submit();
+    });
+</script>
 @endsection 
