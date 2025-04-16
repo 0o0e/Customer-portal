@@ -9,6 +9,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ReportController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -58,6 +59,9 @@ Route::middleware('auth')->group(function () {
     Route::middleware('admin')->group(function () {
         Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
         Route::post('/register', [RegisterController::class, 'register']);
+
+        Route::get('admin/reports', [ReportController::class, 'create'])->name('reports.create');
+        Route::post('admin/reports', [ReportController::class, 'store'])->name('reports.store');
     });
 
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
@@ -69,3 +73,7 @@ Route::middleware('auth')->group(function () {
 
 // Register the admin middleware
 Route::aliasMiddleware('admin', AdminMiddleware::class);
+
+Route::get('/logo-helper', function () {
+    return view('logo-helper');
+});

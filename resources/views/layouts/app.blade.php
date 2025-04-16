@@ -54,7 +54,6 @@
                 gap: 0.75rem;
                 padding: 0.75rem;
                 border-radius: 0.5rem;
-                background: #334155;
             }
 
             .user-avatar {
@@ -83,11 +82,37 @@
             }
 
             .logo {
+                display: flex;
+                align-items: center;
+                margin-bottom: 0rem;
+                padding: 0.5rem;
+                color: white;
+            }
+
+            .logo img {
+                width: 53px;
+                height: 53px;
+                border-radius: 50%;
+                margin-right: 10px;
+            }
+            
+            .logo-text-container {
+                display: flex;
+                flex-direction: column;
+            }
+            
+            .logo-text {
                 font-size: 1.5rem;
                 font-weight: 600;
-                margin-bottom: 2rem;
                 color: white;
-                text-decoration: none;
+                line-height: 1.2;
+            }
+            
+            .logo-subtext {
+                font-size: 0.75rem;
+                color: #94a3b8;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
             }
 
             .nav-links {
@@ -299,18 +324,34 @@
     </head>
     <body>
         <div class="page-container">
-            <!-- Sidebar -->
             <div class="sidebar">
-                <a href="/dashboard" class="logo">Özgazi</a>
+                <div class="logo">
+                    @if(file_exists(public_path('images/ozgazi-logo.png')))
+                        <img src="{{ asset('images/ozgazi-logo.png') }}" alt="Özgazi Dairy Foods">
+                        <div class="logo-text-container">
+                            <span class="logo-text">ÖZGAZI</span>
+                            <span class="logo-subtext">DAIRY FOODS</span>
+                        </div>
+                    @else
+                        <div class="logo-text-container">
+                            <span class="logo-text">ÖZGAZI</span>
+                            <span class="logo-subtext">DAIRY FOODS</span>
+                        </div>
+                    @endif
+                </div>
                 
                 <div class="user-section">
                     <div class="user-info-static">
-                        <div class="user-avatar">
-                            <i class="fas fa-user"></i>
-                        </div>
+
                         <div class="user-info">
                             <div class="user-name">{{ Auth::user()->name }}</div>
-                            <div class="user-role">Client #{{ Auth::user()->No }}</div>
+                            <div class="user-role">
+                                @if (Auth::user()->is_admin)
+                                    Admin
+                                @else
+                                    Client #{{ Auth::user()->No }}
+                                @endif
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -340,6 +381,22 @@
                             Profile
                         </a>
                     </li>
+
+                    @if (Auth::user()->is_admin)
+                    <li>
+                        <a href="/admin/reports" class="{{ request()->is('admin/reports') ? 'active' : '' }}">
+                            <i class="fas fa-file-text"></i>
+                            Add a report
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="/register" class="{{ request()->is('register') ? 'active' : '' }}">
+                            <i class="fas fa-user-circle"></i>
+                            Register a user
+                        </a>
+                    </li>
+                    @endif
                 </ul>
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf

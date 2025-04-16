@@ -130,9 +130,6 @@
         margin-bottom: 30px;
     }
 
-    .header h1 {
-        text-align: center;
-    }
 
     @media (max-width: 768px) {
         .content-grid {
