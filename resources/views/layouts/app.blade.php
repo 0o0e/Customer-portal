@@ -46,6 +46,7 @@
                 padding: 1rem 0;
                 border-bottom: 1px solid #334155;
                 margin-bottom: 1.5rem;
+                position: relative;
             }
 
             .user-info-static {
@@ -54,17 +55,22 @@
                 gap: 0.75rem;
                 padding: 0.75rem;
                 border-radius: 0.5rem;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                justify-content: space-between;
             }
 
-            .user-avatar {
-                width: 40px;
-                height: 40px;
+            .user-info-static:hover {
                 background: #334155;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: #e2e8f0;
+            }
+
+            .user-info-static i {
+                transition: transform 0.3s;
+                color: #94a3b8;
+            }
+
+            .user-section.active .user-info-static i {
+                transform: rotate(180deg);
             }
 
             .user-info {
@@ -303,6 +309,7 @@
             }
 
             .apply-filter-btn {
+                margin-top: 0.5rem;
                 background: #2f60d3;
                 color: white;
                 border: none;
@@ -319,6 +326,62 @@
 
             .apply-filter-btn:hover {
                 background: #1e4ba3;
+            }
+
+            .client-filter-section {
+                margin-bottom: 1.5rem;
+                border-bottom: 1px solid #334155;
+                padding-bottom: 1.5rem;
+            }
+
+            .client-filter-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0.75rem 1rem;
+                background: #334155;
+                border-radius: 0.5rem;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+
+            .client-filter-header:hover {
+                background: #475569;
+            }
+
+            .client-filter-header i {
+                transition: transform 0.3s;
+            }
+
+            .client-filter-section.active .client-filter-header i {
+                transform: rotate(180deg);
+            }
+
+            .client-filter-content {
+                display: none;
+                padding: 1rem;
+                background: #334155;
+                border-radius: 0.5rem;
+                margin-top: 0.5rem;
+            }
+
+            .user-section.active .client-filter-content {
+                display: block;
+            }
+
+            .client-filter-item {
+                padding: 0.5rem 0;
+                border-bottom: 1px solid #475569;
+            }
+
+            .client-filter-item:last-child {
+                border-bottom: none;
+                padding-bottom: 0;
+            }
+
+            .client-label {
+                color: #e2e8f0;
+                font-size: 0.875rem;
             }
         </style>
     </head>
@@ -341,8 +404,7 @@
                 </div>
                 
                 <div class="user-section">
-                    <div class="user-info-static">
-
+                    <div class="user-info-static" id="userInfoTrigger">
                         <div class="user-info">
                             <div class="user-name">{{ Auth::user()->name }}</div>
                             <div class="user-role">
@@ -353,6 +415,35 @@
                                 @endif
                             </div>
                         </div>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+
+                    <div class="client-filter-content">
+                        <form id="clientFilterForm" method="POST" action="{{ route('products.update-clients') }}">
+                            @csrf
+                            @if(isset($relatedCustomers) && $relatedCustomers->count() > 0)
+                                @foreach($relatedCustomers as $customer)
+                                    <div class="client-filter-item">
+                                        <label class="checkbox-container">
+                                            <input type="checkbox" name="selected_clients[]" value="{{ $customer->{'Customer No#'} }}" 
+                                                {{ in_array($customer->{'Customer No#'}, session('selected_clients', [Auth::user()->No])) ? 'checked' : '' }}>
+                                            <span class="checkmark"></span>
+                                            <span class="client-label">Client #{{ $customer->{'Customer No#'} }}</span>
+                                        </label>
+                                    </div>
+                                @endforeach
+                                <div class="client-filter-item">
+                                    <button type="submit" class="apply-filter-btn">
+                                        <i class="fas fa-check"></i>
+                                        Apply Filters
+                                    </button>
+                                </div>
+                            @else
+                                <div class="client-filter-item">
+                                    No related customers found
+                                </div>
+                            @endif
+                        </form>
                     </div>
                 </div>
 
@@ -370,9 +461,29 @@
                         </a>
                     </li>
                     <li>
+                        <a href="/quotes" class="{{ request()->is('quotes') ? 'active' : '' }}">
+                            <i class="fas fa-file-invoice"></i>
+                            Quotes
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/order/create" class="{{ request()->is('order/create') ? 'active' : '' }}">
+                            <i class="fas fa-plus-circle"></i>
+                            Create Quote
+                        </a>
+                    </li>
+                    <li>
                         <a href="/products" class="{{ request()->is('products') ? 'active' : '' }}">
                             <i class="fas fa-box"></i>
                             Products
+                        </a>
+                    </li>
+
+                    
+                    <li>
+                        <a href="/reports" class="{{ request()->is('reports') ? 'active' : '' }}">
+                            <i class="fas fa-file-text"></i>
+                            Reports
                         </a>
                     </li>
                     <li>
@@ -382,10 +493,11 @@
                         </a>
                     </li>
 
+
                     @if (Auth::user()->is_admin)
                     <li>
                         <a href="/admin/reports" class="{{ request()->is('admin/reports') ? 'active' : '' }}">
-                            <i class="fas fa-file-text"></i>
+                            <i class="fas fa-pencil"></i>
                             Add a report
                         </a>
                     </li>
@@ -424,6 +536,68 @@
             document.querySelector('.hamburger').addEventListener('click', function() {
                 document.querySelector('.sidebar').classList.toggle('active');
             });
+
+            // Client filter functionality
+            const userInfoTrigger = document.getElementById('userInfoTrigger');
+            const userSection = document.querySelector('.user-section');
+            const clientFilterForm = document.getElementById('clientFilterForm');
+
+            if (userInfoTrigger) {
+                userInfoTrigger.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    userSection.classList.toggle('active');
+                });
+            }
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (userSection && !e.target.closest('.user-section')) {
+                    userSection.classList.remove('active');
+                }
+            });
+
+            // Prevent dropdown from closing when clicking inside
+            const clientFilterContent = document.querySelector('.client-filter-content');
+            if (clientFilterContent) {
+                clientFilterContent.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+            }
+
+            // Handle client filter form submission
+            if (clientFilterForm) {
+                clientFilterForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const formData = new FormData(this);
+                    
+                    fetch('{{ route("products.update-clients") }}', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok: ' + response.status);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            window.location.reload();
+                        } else {
+                            alert("Error applying filter. Please try again.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error applying client filter:", error);
+                        alert("Error applying filter: " + error.message);
+                    });
+                });
+            }
         </script>
     </body>
     </html>
