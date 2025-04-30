@@ -1,6 +1,7 @@
 <?php
 use App\Http\Controllers\AuthController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductController;
@@ -10,7 +11,9 @@ use App\Http\Middleware\AdminMiddleware;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ReportController;
-
+use App\Http\Controllers\ReportViewController;
+use App\Http\Controllers\BusinessCentralController;
+use App\Http\Controllers\ClientOrderController;
 Route::get('/', function () {
     return view('welcome');
 });
@@ -49,6 +52,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/products/update-clients', [ProductController::class, 'updateClients'])->name('products.update-clients');
     Route::post('/orders/update-clients', [OrderController::class, 'updateClients'])->name('orders.update-clients');
 
+    Route::get('/reports/{id}', [ReportViewController::class, 'show'])->name('reports.show');
+    Route::get('/reports', [ReportViewController::class, 'index'])->name('reports.index');
     Route::match(['get', 'post'], '/profile', [ProfileController::class, 'show'])->name('profile.index');
 
     // Profile routes
@@ -68,10 +73,54 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::post('/orders', [OrderController::class, 'index']);
+    
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+
+    // Client Order Routes
+    Route::get('order/create', [ClientOrderController::class, 'create'])->name('client-orders.create');
+    Route::post('order/store', [ClientOrderController::class, 'store'])->name('client-orders.store');
+    Route::get('quotes', [ClientOrderController::class, 'index'])->name('client-orders.index');
+    Route::get('quotes/{id}', [ClientOrderController::class, 'show'])->name('client-orders.show');
+    Route::get('quotes/{id}/edit', [ClientOrderController::class, 'edit'])->name('client-orders.edit');
+    Route::put('quotes/{id}', [ClientOrderController::class, 'update'])->name('client-orders.update');
+
+    
+    Route::get('/create-quotes-order', function () {
+        $order = Http::businessCentral()->post('salesQuotes', [
+            'customerNumber' => "K0000056",
+            'shipToName' => 'AYTAC Foods Distribution Limited',
+            'externalDocumentNumber' => "3312",
+            'salesQuoteLines' => [
+                [
+                    'lineType' => 'Item',
+                    'lineObjectNumber' => "E00.40.141-001",
+                    'quantity' => 10,
+                    'unitPrice' => 20.0
+                ]
+            ]
+        ]);
+    
+        $orderData = $order->json();
+        $orderId = $orderData['id'] ?? null;
+    
+        if (!$orderId) {
+            dd('Order creation failed:', $order->body());
+        }
+    
+        // Get sales lines and include item number using $expand
+        $salesLines = Http::businessCentral()->get("salesOrders($orderId)/salesOrderLines?\$expand=item");
+    
+        // Dump everything
+        dd([
+            'Order' => $orderData,
+            'Status' => $order->status(),
+            'SalesLines' => $salesLines->json(),
+        ]);
+    });
+    
+    
 });
 
-// Register the admin middleware
 Route::aliasMiddleware('admin', AdminMiddleware::class);
 
 Route::get('/logo-helper', function () {
