@@ -6,7 +6,6 @@
     <title>Customer Login - Özgazi</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        /* Existing styles */
         body {
             font-family: 'Poppins', sans-serif;
             background-color: #f4f6f8;
@@ -73,6 +72,7 @@
             font-size: 18px;
             font-weight: 600;
             transition: background-color 0.3s;
+            margin-top: 10px;
         }
 
         button:hover {
@@ -90,7 +90,6 @@
             margin: 5px 0;
         }
 
-        /* Responsive Design */
         @media (max-width: 480px) {
             .login-container {
                 padding: 20px;
