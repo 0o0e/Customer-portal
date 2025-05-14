@@ -101,19 +101,19 @@
                 border-radius: 50%;
                 margin-right: 10px;
             }
-            
+
             .logo-text-container {
                 display: flex;
                 flex-direction: column;
             }
-            
+
             .logo-text {
                 font-size: 1.5rem;
                 font-weight: 600;
                 color: white;
                 line-height: 1.2;
             }
-            
+
             .logo-subtext {
                 font-size: 0.75rem;
                 color: #94a3b8;
@@ -402,7 +402,7 @@
                         </div>
                     @endif
                 </div>
-                
+
                 <div class="user-section">
                     <div class="user-info-static" id="userInfoTrigger">
                         <div class="user-info">
@@ -425,7 +425,7 @@
                                 @foreach($relatedCustomers as $customer)
                                     <div class="client-filter-item">
                                         <label class="checkbox-container">
-                                            <input type="checkbox" name="selected_clients[]" value="{{ $customer->{'Customer No#'} }}" 
+                                            <input type="checkbox" name="selected_clients[]" value="{{ $customer->{'Customer No#'} }}"
                                                 {{ in_array($customer->{'Customer No#'}, session('selected_clients', [Auth::user()->No])) ? 'checked' : '' }}>
                                             <span class="checkmark"></span>
                                             <span class="client-label">Client #{{ $customer->{'Customer No#'} }}</span>
@@ -479,7 +479,7 @@
                         </a>
                     </li>
 
-                    
+
                     <li>
                         <a href="/reports" class="{{ request()->is('reports') ? 'active' : '' }}">
                             <i class="fas fa-file-text"></i>
@@ -497,17 +497,25 @@
                     @if (Auth::user()->is_admin)
                     <li>
                         <a href="/admin/reports" class="{{ request()->is('admin/reports') ? 'active' : '' }}">
-                            <i class="fas fa-pencil"></i>
+                            <i class="fas fa-lock"></i>
                             Add a report
                         </a>
                     </li>
 
                     <li>
                         <a href="/register" class="{{ request()->is('register') ? 'active' : '' }}">
-                            <i class="fas fa-user-circle"></i>
+                            <i class="fas fa-lock"></i>
                             Register a user
                         </a>
                     </li>
+
+                    <li>
+                        <a href="/admin/requests" class="{{ request()->is('admin/requests') ? 'active' : '' }}">
+                            <i class="fas fa-lock"></i>
+                            Product Requests
+                        </a>
+                    </li>
+
                     @endif
                 </ul>
                 <form action="{{ route('logout') }}" method="POST">
@@ -519,7 +527,6 @@
                 </form>
             </div>
 
-            <!-- Main Content -->
             <div class="main-content">
 
                 @yield('content')
@@ -568,9 +575,9 @@
             if (clientFilterForm) {
                 clientFilterForm.addEventListener('submit', function(e) {
                     e.preventDefault();
-                    
+
                     const formData = new FormData(this);
-                    
+
                     fetch('{{ route("products.update-clients") }}', {
                         method: 'POST',
                         body: formData,

@@ -109,6 +109,25 @@
         transition: all 0.3s ease;
     }
 
+    .request-button {
+        padding: 12px 30px;
+        background-color: #10b981;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .request-button:hover {
+        background-color: #059669;
+        transform: translateY(-1px);
+    }
+
     .search-button:hover {
         background-color: #1e4ba3;
         transform: translateY(-1px);
@@ -218,6 +237,7 @@
             <input type="text" class="search-input" name="search" value="{{ session('search') }}" placeholder="Search products...">
             <button type="submit" class="search-button">Search</button>
         </form>
+        <a href="{{ route('products.request') }}" class="request-button">Request New Product</a>
     </div>
     
 

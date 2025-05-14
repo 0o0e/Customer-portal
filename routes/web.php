@@ -50,6 +50,8 @@ Route::middleware('auth')->group(function () {
     Route::match(['get', 'post'], '/products', [ProductController::class, 'index'])->name('products.index');
     Route::post('/products/search', [ProductController::class, 'search'])->name('products.search');
     Route::post('/products/update-clients', [ProductController::class, 'updateClients'])->name('products.update-clients');
+    Route::get('/products/request', [ProductController::class, 'showRequestForm'])->name('products.request');
+    Route::post('/products/request', [ProductController::class, 'storeRequest'])->name('products.request.store');
     Route::post('/orders/update-clients', [OrderController::class, 'updateClients'])->name('orders.update-clients');
 
     Route::get('/reports/{id}', [ReportViewController::class, 'show'])->name('reports.show');
@@ -67,13 +69,15 @@ Route::middleware('auth')->group(function () {
 
         Route::get('admin/reports', [ReportController::class, 'create'])->name('reports.create');
         Route::post('admin/reports', [ReportController::class, 'store'])->name('reports.store');
-    });
+        Route::get('/admin/requests', [ProductController::class, 'adminRequests'])->name('admin.product-requests');
+        Route::post('/admin/requests/{id}', [ProductController::class, 'handleRequest'])->name('admin.product-requests.handle');
+            });
 
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::post('/orders', [OrderController::class, 'index']);
-    
+
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
 
     // Client Order Routes
@@ -84,7 +88,6 @@ Route::middleware('auth')->group(function () {
     Route::get('quotes/{id}/edit', [ClientOrderController::class, 'edit'])->name('client-orders.edit');
     Route::put('quotes/{id}', [ClientOrderController::class, 'update'])->name('client-orders.update');
 
-    
     Route::get('/create-quotes-order', function () {
         $order = Http::businessCentral()->post('salesQuotes', [
             'customerNumber' => "K0000056",
@@ -99,17 +102,17 @@ Route::middleware('auth')->group(function () {
                 ]
             ]
         ]);
-    
+
         $orderData = $order->json();
         $orderId = $orderData['id'] ?? null;
-    
+
         if (!$orderId) {
             dd('Order creation failed:', $order->body());
         }
-    
+
         // Get sales lines and include item number using $expand
         $salesLines = Http::businessCentral()->get("salesOrders($orderId)/salesOrderLines?\$expand=item");
-    
+
         // Dump everything
         dd([
             'Order' => $orderData,
@@ -117,8 +120,8 @@ Route::middleware('auth')->group(function () {
             'SalesLines' => $salesLines->json(),
         ]);
     });
-    
-    
+
+
 });
 
 Route::aliasMiddleware('admin', AdminMiddleware::class);
