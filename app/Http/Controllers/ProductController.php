@@ -77,14 +77,11 @@ class ProductController extends Controller
 
     public function updateClients(Request $request)
     {
-        // Refresh the user data from the database
         $user = Auth::user();
         $user->refresh();
 
-        // Get selected clients from request, default to current user if none selected
         $selectedClients = $request->input('selected_clients', [$user->No]);
 
-        // Log the selected clients for debugging
         \Log::info('Updating selected clients:', [
             'user_id' => $user->id,
             'user_no' => $user->No,
@@ -92,7 +89,6 @@ class ProductController extends Controller
             'request_data' => $request->all()
         ]);
 
-        // Store in session
         session(['selected_clients' => $selectedClients]);
 
         return response()->json(['success' => true, 'selected_clients' => $selectedClients]);
@@ -105,12 +101,11 @@ class ProductController extends Controller
     public function storeRequest(Request $request)
     {
         try {
-            // Log the incoming request data
             \Log::info('Received product request:', $request->all());
 
             $request->validate([
-                'description' => 'required|string|max:255',         // Changed from Description
-                'search_description' => 'required|string|max:255',  // Changed from Search_Description
+                'description' => 'required|string|max:255',
+                'search_description' => 'required|string|max:255',
                 'Description_2' => 'required|string|max:255',
                 'Base_Unit_of_Measure' => 'required|string|max:10',
                 'Vendor_Item_No' => 'required|string|max:50',
@@ -131,7 +126,7 @@ class ProductController extends Controller
             } while ($exists);
 
             DB::table('item_request')->insert([
-                'Description' => $request->description,              // Changed to match form field names
+                'Description' => $request->description,
                 'Search_Description' => $request->search_description,
                 'Description_2' => $request->Description_2,
                 'Base_Unit_of_Measure' => $request->Base_Unit_of_Measure,
@@ -161,7 +156,6 @@ class ProductController extends Controller
                 ->withInput();
         }
     }
-        // Add these methods to your existing ProductController class
         public function adminRequests()
         {
             if (!Auth::user()->is_admin) {
@@ -169,7 +163,7 @@ class ProductController extends Controller
             }
 
             $requests = DB::table('item_request')
-                ->join('users', 'item_request.No', '=', 'users.No') // This is correct now - joining on user No
+                ->join('users', 'item_request.No', '=', 'users.No')
                 ->select('item_request.*', 'users.name as user_name')
                 ->get();
 
@@ -186,7 +180,6 @@ class ProductController extends Controller
 
                 $action = $request->input('action');
 
-                // Use No_2 to find the request
                 $itemRequest = DB::table('item_request')->where('No_2', $no)->first();
 
                 if (!$itemRequest) {
@@ -206,26 +199,24 @@ class ProductController extends Controller
                         'Price_Unit_Conversion' => $itemRequest->Price_Unit_Conversion,
                         'Type' => $itemRequest->Type,
                         'Inventory_Posting_Group' => $itemRequest->Inventory_Posting_Group,
-                        'SystemCreatedAt' => now() // Add current timestamp
+                        'SystemCreatedAt' => now() 
 
 
                                 ]);
-                                            // Insert into Catalog table
                         DB::table('Catalog')->insert([
                             'Item No#' => $itemRequest->No_2,
                             'Item Description' => $itemRequest->Description,
-                            'Customer No#' => $itemRequest->No, // The customer who requested it
-                            'Item Catalog' => $itemRequest->No_2, // Using same as Item No
+                            'Customer No#' => $itemRequest->No,
+                            'Item Catalog' => $itemRequest->No_2,
                             'Description' => $itemRequest->Description_2,
                             'Sales Unit of Measure' => $itemRequest->Base_Unit_of_Measure,
-                            'Variant Code' => '', // Default empty
+                            'Variant Code' => '',
                             'Valid from Date' => now(),
-                            'Valid to Date' => null, // Set validity for 10 years
-                            'MAIN CUSTOMER' => $itemRequest->No // The customer who requested it
+                            'Valid to Date' => null, 
+                            'MAIN CUSTOMER' => $itemRequest->No 
                         ]);
                 }
 
-                // Delete the request
                 DB::table('item_request')->where('No_2', $no)->delete();
 
                 DB::commit();
