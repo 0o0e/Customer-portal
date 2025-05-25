@@ -62,6 +62,41 @@
         margin-top: 2rem;
     }
 
+    .action-buttons {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .action-button {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        text-align: center;
+        text-decoration: none;
+        color: #1a1a1a;
+        font-weight: 600;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+    }
+
+    .action-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        color: #1a1a1a;
+    }
+
+    .action-button i {
+        font-size: 1.5rem;
+        color: #4a90e2;
+    }
+
     .dashboard-box {
         background: white;
         border-radius: 16px;
@@ -102,6 +137,7 @@
         color: #1f2937;
         margin-bottom: 1rem;
         font-weight: 600;
+        
     }
 
     .dashboard-box p {
@@ -146,6 +182,8 @@
         <p>Here's an overview of your dashboard.</p>
     </div>
 
+
+
     <div class="stats-container">
         <div class="dashboard-box" onclick="window.location.href='/orders'">
             <i class="fas fa-shopping-cart"></i>
@@ -162,6 +200,26 @@
             <h3>All Products</h3>
             <p>Browse our product catalog</p>
         </div>
+        
+        <a href="/quotes/create" class="action-button">
+            <i class="fas fa-file-invoice"></i>
+            <span>Create Quote</span>
+        </a>
+        <a href="/quotes" class="action-button">
+            <i class="fas fa-list"></i>
+            <span>View Quotes</span>
+        </a>
+        <a href="/profile" class="action-button">
+            <i class="fas fa-user"></i>
+            <span>My Profile</span>
+        </a>
+        <a href="/reports" class="action-button">
+            <i class="fas fa-chart-bar"></i>
+            <span>Reports</span>
+        </a>
     </div>
 </div>
+
+<!-- Add Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 @endsection
