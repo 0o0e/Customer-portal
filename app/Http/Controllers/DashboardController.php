@@ -19,21 +19,55 @@ class DashboardController extends Controller
             session(['selected_clients' => $selectedClients]);
         }
 
-
-        // Get related customers from catalog table
-        $relatedCustomers = DB::table('catalog')
-            ->where('MAIN CUSTOMER', $user->No)
-            ->select('Customer No#')
-            ->distinct()
+        // Get recent sales orders (using string 'Order' for Document_Type)
+        $recentOrders = DB::table('Sales_Header')
+            ->whereIn('Sell-to_Customer_No', $selectedClients)
+            ->where('Document_Type', 1) // 1 = Order
+            ->select('No', 'Order_Date', 'Status', 'Amount', 'Ship-to_Name')
+            ->orderBy('Order_Date', 'desc')
+            ->limit(5)
             ->get();
 
-        // Get products for the current user
-        $products = DB::table('catalog')
-            ->where('MAIN CUSTOMER', $user->No)
-            ->select('Item Description', 'Item Catalog', 'Description', 'Sales Unit of Measure', 'Valid from Date', 'Valid to Date')
+        // Get total products count
+        $totalProducts = DB::table('catalog')
+            ->whereIn('MAIN CUSTOMER', $selectedClients)
+            ->count();
+
+        // Get pending product requests
+        $pendingRequests = DB::table('item_request')
+            ->whereIn('No', function($query) use ($selectedClients) {
+                $query->select('Item No#')
+                    ->from('catalog')
+                    ->whereIn('MAIN CUSTOMER', $selectedClients);
+            })
+            ->where('Blocked', false)
+            ->count();
+
+        // Get total orders count
+        $totalOrders = DB::table('Sales_Header')
+            ->whereIn('Sell-to_Customer_No', $selectedClients)
+            ->where('Document_Type', 1) // 1 = Order
+            ->count();
+
+        // Get recent product requests
+        $recentRequests = DB::table('item_request')
+            ->whereIn('No', function($query) use ($selectedClients) {
+                $query->select('Item No#')
+                    ->from('catalog')
+                    ->whereIn('MAIN CUSTOMER', $selectedClients);
+            })
+            ->select('No', 'Description', 'Base_Unit_of_Measure', 'Unit_Price')
+            ->orderBy('SystemCreatedAt', 'desc')
+            ->limit(5)
             ->get();
 
-        return view('dashboard', compact('products', 'relatedCustomers'));
+        return view('dashboard', compact(
+            'recentOrders',
+            'totalProducts',
+            'pendingRequests',
+            'totalOrders',
+            'recentRequests'
+        ));
     }
 
 }

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Login - Özgazi</title>
+    <title>Reset Password - Özgazi</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         body {
@@ -16,7 +16,7 @@
             margin: 0;
         }
 
-        .login-container {
+        .container {
             width: 100%;
             max-width: 400px;
             padding: 30px;
@@ -68,30 +68,43 @@
             color: white;
             border: none;
             border-radius: 5px;
+            font-size: 16px;
             cursor: pointer;
-            font-size: 18px;
-            font-weight: 600;
             transition: background-color 0.3s;
-            margin-top: 10px;
         }
 
         button:hover {
             background-color: #2f60d3;
         }
 
-        .error-message {
-            margin-top: 20px;
-            color: #2f60d3;
-            font-size: 14px;
-            text-align: left;
+        .alert {
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
         }
 
-        .error-message p {
-            margin: 5px 0;
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 20px;
+            color: #2f60d3;
+            text-decoration: none;
+            font-size: 14px;
         }
 
         @media (max-width: 480px) {
-            .login-container {
+            .container {
                 padding: 20px;
                 width: 90%;
             }
@@ -102,44 +115,49 @@
         }
     </style>
 </head>
-
-
 <body>
-<div class="login-container">
-    <h2>Login</h2>
+    <div class="container">
+        <h2>Reset Password</h2>
 
-    @if ($errors->any())
-        <div>
-            @foreach ($errors->all() as $error)
-                <p style="color: red;">{{ $error }}</p>
-            @endforeach
-        </div>
-    @endif
-
-    <form action="{{ route('login') }}" method="POST">
-        @csrf
-        <div class="form-group">
-            <label>Username:</label>
-            <input type="text" name="name" required>
-        </div>
-
-        <div class="form-group">
-            <label>Client Number:</label>
-            <input type="text" name="No" required>
-        </div>
-
-        <div class="form-group">
-            <label>Password:</label>
-            <input type="password" name="password" required>
-            <div style="text-align: right; margin-top: 5px;">
-                <a href="{{ route('password.request') }}" style="color: #2f60d3; text-decoration: none; font-size: 14px;">
-                    Forgot Password?
-                </a>
+        @if (session('status'))
+            <div class="alert alert-success">
+                {{ session('status') }}
             </div>
-        </div>
+        @endif
 
-        <button type="submit">Login</button>
-    </form>
-</div>
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                @foreach ($errors->all() as $error)
+                    <p>{{ $error }}</p>
+                @endforeach
+            </div>
+        @endif
+
+        <form method="POST" action="{{ route('password.email') }}">
+            @csrf
+            <div class="form-group">
+                <label for="name">Username:</label>
+                <input type="text" id="name" name="name" value="{{ old('name') }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="No">Client Number:</label>
+                <input type="text" id="No" name="No" value="{{ old('No') }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address:</label>
+                <input type="email" id="email" name="email" value="{{ old('email') }}" required>
+            </div>
+
+            <button type="submit">
+                Send Password Reset Link
+            </button>
+        </form>
+
+        <a href="{{ route('login') }}" class="back-link">
+            Back to Login
+        </a>
+    </div>
 </body>
 </html>
