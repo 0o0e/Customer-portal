@@ -15,6 +15,7 @@ use App\Http\Controllers\ReportViewController;
 use App\Http\Controllers\BusinessCentralController;
 use App\Http\Controllers\ClientOrderController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\InvoiceController;
 Route::get('/', function () {
     return view('welcome');
 });
@@ -130,6 +131,9 @@ Route::middleware('auth')->group(function () {
         ]);
     });
 
+    // Invoice Routes
+    Route::get('/invoices', [InvoiceController::class, 'index'])->name('invoices.index');
+    Route::get('/invoices/{documentNo}', [InvoiceController::class, 'show'])->name('invoices.show');
 
 });
 

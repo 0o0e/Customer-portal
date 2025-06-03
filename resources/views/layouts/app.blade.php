@@ -402,19 +402,16 @@
                         </div>
                     @endif
                 </div>
+
                 <div class="user-section">
                     <div class="user-info-static" id="userInfoTrigger">
                         <div class="user-info">
-                            @php
-                                // BUG: Showing first user's data instead of logged in user!
-                                $bugUser = \App\Models\User::first();  // This is the bug
-                            @endphp
-                            <div class="user-name">{{ $bugUser->name }}</div>
+                            <div class="user-name">{{ Auth::user()->name }}</div>
                             <div class="user-role">
-                                @if ($bugUser->is_admin)
+                                @if (Auth::user()->is_admin)
                                     Admin
                                 @else
-                                    Client #{{ $bugUser->No }}
+                                    Client #{{ Auth::user()->No }}
                                 @endif
                             </div>
                         </div>
