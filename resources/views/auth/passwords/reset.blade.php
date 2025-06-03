@@ -24,6 +24,7 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
             text-align: center;
+            margin-top: 200px;
         }
 
         h2 {

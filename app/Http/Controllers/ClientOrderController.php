@@ -132,7 +132,6 @@ class ClientOrderController extends Controller
                 return back()->with('error', 'Quote not found.');
             }
 
-            // The quote data is already an array from the API response
             return view('client-orders.show', ['quote' => $quote]);
         } catch (\Exception $e) {
             return back()->with('error', 'Could not fetch quote details: ' . $e->getMessage());
