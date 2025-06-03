@@ -75,9 +75,33 @@
         font-size: 0.95rem;
         text-align: center;
     }
+    @media print {
+    body, html {
+        background: #fff !important;
+    }
+    .sidebar, .d-print-none, .btn, .main-content > .d-print-none, .logo, .hamburger {
+        display: none !important;
+    }
+    .main-content {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    .invoice-box {
+        box-shadow: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        max-width: 100% !important;
+    }
+}
 </style>
 <div class="invoice-box">
-    
+
+    <div class="d-print-none" style="text-align:right; margin-bottom:20px;">
+        <button onclick="window.print()" class="btn btn-primary">
+            <i class="fas fa-print"></i> Print Invoice
+        </button>
+    </div>
+
     <div class="invoice-header">
         <div class="company-details">
             <div style="font-size:1.5rem; font-weight:bold;">Özgazi dairy foods</div>
