@@ -10,14 +10,14 @@ class OrderController extends Controller
 {
     public function index()
     {
-        
+
         $customerNo = auth()->user()->No;
-        
+
         $orders = DB::table('Sales_Header')
             ->where('Sell-to_Customer_No', $customerNo)
             ->orWhere('Bill-to_Customer_No', $customerNo)
             ->orderBy('Order_Date', 'desc')  // Most recent first
-            ->paginate(10);                  // 10 orders per page
+            ->paginate(10); // 10 orders per page
 
         return view('orders.index', compact('orders'));
     }
@@ -38,4 +38,4 @@ class OrderController extends Controller
 
         return view('orders.show', compact('order', 'orderLines'));
     }
-} 
+}
