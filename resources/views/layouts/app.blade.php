@@ -544,7 +544,7 @@
                 document.querySelector('.sidebar').classList.toggle('active');
             });
 
-            // Client filter functionality
+            // Client filter
             const userInfoTrigger = document.getElementById('userInfoTrigger');
             const userSection = document.querySelector('.user-section');
             const clientFilterForm = document.getElementById('clientFilterForm');
