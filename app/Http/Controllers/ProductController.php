@@ -74,6 +74,7 @@ class ProductController extends Controller
         session(['search' => $request->search]);
         return redirect()->route('products.index');
     }
+    
 
     public function updateClients(Request $request)
     {
@@ -90,8 +91,9 @@ class ProductController extends Controller
         ]);
 
         session(['selected_clients' => $selectedClients]);
+        session(['client_filter_message' => 'Client filter applied successfully!']);
 
-        return response()->json(['success' => true, 'selected_clients' => $selectedClients]);
+        return redirect()->back();
     }
 
     public function showRequestForm()

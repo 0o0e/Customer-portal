@@ -239,7 +239,6 @@
                 }
             }
 
-            /* Custom scrollbar for the dropdown */
             .user-dropdown-content::-webkit-scrollbar {
                 width: 6px;
             }
@@ -383,6 +382,16 @@
                 color: #e2e8f0;
                 font-size: 0.875rem;
             }
+
+            .client-filter-message {
+                margin-top: 0.5rem;
+                padding: 0.5rem;
+                background: rgba(34, 197, 94, 0.1);
+                color: #22c55e;
+                border-radius: 0.25rem;
+                font-size: 0.875rem;
+                text-align: center;
+            }
         </style>
     </head>
     <body>
@@ -444,6 +453,12 @@
                                 </div>
                             @endif
                         </form>
+                        
+                        @if(session('client_filter_message'))
+                            <div class="client-filter-message">
+                                {{ session('client_filter_message') }}
+                            </div>
+                        @endif
                     </div>
                 </div>
 
@@ -568,41 +583,6 @@
             if (clientFilterContent) {
                 clientFilterContent.addEventListener('click', function(e) {
                     e.stopPropagation();
-                });
-            }
-
-            // Handle client filter form submission
-            if (clientFilterForm) {
-                clientFilterForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-
-                    const formData = new FormData(this);
-
-                    fetch('{{ route("products.update-clients") }}', {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
-                            'Accept': 'application/json'
-                        }
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok: ' + response.status);
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data.success) {
-                            window.location.reload();
-                        } else {
-                            alert("Error applying filter. Please try again.");
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Error applying client filter:", error);
-                        alert("Error applying filter: " + error.message);
-                    });
                 });
             }
         </script>
