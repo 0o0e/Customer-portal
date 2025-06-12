@@ -135,16 +135,7 @@
             </table>
         </div>
         <div class="col-md-6">
-            <table class="table table-borderless info-table mb-0">
-                <tr>
-                    <th>Transport Method:</th>
-                    <td>{{ $invoiceHeader->Transport_Method }}</td>
-                </tr>
-                <tr>
-                    <th>Responsibility Center:</th>
-                    <td>{{ $invoiceHeader->Responsibility_Center }}</td>
-                </tr>
-            </table>
+
         </div>
     </div>
     <h5 class="mt-4 mb-3" style="font-weight:600;">Invoice Items</h5>

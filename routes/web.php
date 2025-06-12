@@ -20,27 +20,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-
-// Route::get('/customer/login', [AuthController::class, 'showLogin'])->name('login');
-// Route::post('/customer/login', [AuthController::class, 'login']);
-// Route::get('/customer/logout', [AuthController::class, 'logout'])->name('logout');
-
-
-
-// Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login.form');
-// Route::post('/login', [LoginController::class, 'login'])->name('login');
-// Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-
-
-
-// Route::get('/customer/dashboard', function () {
-//     return view('dashboard');
-// });
-
-// Route::middleware('auth')->group(function () {
-//     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-// });
-
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [LoginController::class, 'login']);
@@ -58,7 +37,7 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::match(['get', 'post'], '/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::match(['get', 'post'], '/products', [ProductController::class, 'index'])->name('products.index');
-    Route::post('/products/search', [ProductController::class, 'search'])->name('products.search');
+    Route::match(['get', 'post'], '/products/search', [ProductController::class, 'search'])->name('products.search');
     Route::post('/products/update-clients', [ProductController::class, 'updateClients'])->name('products.update-clients');
     Route::get('/products/request', [ProductController::class, 'showRequestForm'])->name('products.request');
     Route::post('/products/request', [ProductController::class, 'storeRequest'])->name('products.request.store');
@@ -68,20 +47,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/reports', [ReportViewController::class, 'index'])->name('reports.index');
     Route::match(['get', 'post'], '/profile', [ProfileController::class, 'show'])->name('profile.index');
 
-    // Profile routes
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
     Route::post('/profile/update-password', [ProfileController::class, 'updatePassword'])->name('profile.update-password');
-
-    // Admin routes
-    Route::middleware('admin')->group(function () {
-        Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
-        Route::post('/register', [RegisterController::class, 'register']);
-
-        Route::get('admin/reports', [ReportController::class, 'create'])->name('reports.create');
-        Route::post('admin/reports', [ReportController::class, 'store'])->name('reports.store');
-        Route::get('/admin/requests', [ProductController::class, 'adminRequests'])->name('admin.product-requests');
-        Route::post('/admin/requests/{id}', [ProductController::class, 'handleRequest'])->name('admin.product-requests.handle');
-            });
 
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
@@ -98,44 +65,57 @@ Route::middleware('auth')->group(function () {
     Route::get('quotes/{id}/edit', [ClientOrderController::class, 'edit'])->name('client-orders.edit');
     Route::put('quotes/{id}', [ClientOrderController::class, 'update'])->name('client-orders.update');
 
-    Route::get('/create-quotes-order', function () {
-        $order = Http::businessCentral()->post('salesQuotes', [
-            'customerNumber' => "K0000056",
-            'shipToName' => 'AYTAC Foods Distribution Limited',
-            'externalDocumentNumber' => "3312",
-            'salesQuoteLines' => [
-                [
-                    'lineType' => 'Item',
-                    'lineObjectNumber' => "E00.40.141-001",
-                    'quantity' => 10,
-                    'unitPrice' => 20.0
-                ]
-            ]
-        ]);
+    // Route::get('/create-quotes-order', function () {
+    //     $order = Http::businessCentral()->post('salesQuotes', [
+    //         'customerNumber' => "K0000056",
+    //         'shipToName' => 'AYTAC Foods Distribution Limited',
+    //         'externalDocumentNumber' => "3312",
+    //         'salesQuoteLines' => [
+    //             [
+    //                 'lineType' => 'Item',
+    //                 'lineObjectNumber' => "E00.40.141-001",
+    //                 'quantity' => 10,
+    //                 'unitPrice' => 20.0
+    //             ]
+    //         ]
+    //     ]);
 
-        $orderData = $order->json();
-        $orderId = $orderData['id'] ?? null;
+    //     $orderData = $order->json();
+    //     $orderId = $orderData['id'] ?? null;
 
-        if (!$orderId) {
-            dd('Order creation failed:', $order->body());
-        }
+    //     if (!$orderId) {
+    //         dd('Order creation failed:', $order->body());
+    //     }
 
-        // Get sales lines and include item number using $expand
-        $salesLines = Http::businessCentral()->get("salesOrders($orderId)/salesOrderLines?\$expand=item");
+    //     // Get sales lines and include item number using $expand
+    //     $salesLines = Http::businessCentral()->get("salesOrders($orderId)/salesOrderLines?\$expand=item");
 
-        // Dump everything
-        dd([
-            'Order' => $orderData,
-            'Status' => $order->status(),
-            'SalesLines' => $salesLines->json(),
-        ]);
-    });
+    //     // Dump everything
+    //     dd([
+    //         'Order' => $orderData,
+    //         'Status' => $order->status(),
+    //         'SalesLines' => $salesLines->json(),
+    //     ]);
+    // });
 
     // Invoice Routes
     Route::get('/invoices', [InvoiceController::class, 'index'])->name('invoices.index');
     Route::get('/invoices/{documentNo}', [InvoiceController::class, 'show'])->name('invoices.show');
 
 });
+
+
+    // Admin routes
+    Route::middleware('admin')->group(function () {
+        Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+        Route::post('/register', [RegisterController::class, 'register']);
+
+        Route::get('admin/reports', [ReportController::class, 'create'])->name('reports.create');
+        Route::post('admin/reports', [ReportController::class, 'store'])->name('reports.store');
+        Route::get('/admin/requests', [ProductController::class, 'adminRequests'])->name('admin.product-requests');
+        Route::post('/admin/requests/{id}', [ProductController::class, 'handleRequest'])->name('admin.product-requests.handle');
+            });
+
 
 Route::aliasMiddleware('admin', AdminMiddleware::class);
 

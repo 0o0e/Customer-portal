@@ -198,7 +198,7 @@
         <div class="dashboard-box" onclick="window.location.href='/products'">
             <i class="fas fa-box"></i>
             <h3>All Products</h3>
-            <p>Browse our product catalog</p>
+            <p></p>
         </div>
         
         <a href="/quotes/create" class="action-button">

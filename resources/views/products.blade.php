@@ -236,6 +236,7 @@
             @csrf
             <input type="text" class="search-input" name="search" value="{{ session('search') }}" placeholder="Search products...">
             <button type="submit" class="search-button">Search</button>
+
         </form>
         <a href="{{ route('products.request') }}" class="request-button">Request New Product</a>
     </div>

@@ -11,13 +11,14 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
+
         $selectedClients = session('selected_clients', [$user->No]);
-        
         // If this is a POST request with selected clients, update the session
-        if ($request->isMethod('post')) {
-            $selectedClients = $request->input('selected_clients', [$user->No]);
-            session(['selected_clients' => $selectedClients]);
-        }
+        // if ($request->isMethod('post')) {
+        //     $selectedClients = $request->input('selected_clients', [$user->No]);
+        //     session(['selected_clients' => $selectedClients]);
+
+        // }
 
         // Get recent sales orders (using string 'Order' for Document_Type)
         $recentOrders = DB::table('Sales_Header')
