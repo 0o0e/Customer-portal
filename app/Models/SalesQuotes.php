@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Http;
 
 class SalesQuotes
 {
-    protected $baseUrl = 'salesQuotes';
+    // protected $baseUrl = 'salesQuotes';
 
     public static function find($id)
     {
@@ -21,24 +21,14 @@ class SalesQuotes
         return $response->json();
     }
 
-    public static function update($id, $data)
-    {
-        $response = Http::businessCentral()->patch("salesQuotes($id)", $data);
-        return $response;
-    }
-
-    public static function updateLine($quoteId, $lineId, $data)
-    {
-        $response = Http::businessCentral()->patch("salesQuotes($quoteId)/salesQuoteLines($lineId)", $data);
-        return $response;
-    }
-
+    // send data to business central
     public static function create($data)
     {
         $response = Http::businessCentral()->post('salesQuotes', $data);
         return $response;
     }
 
+    
     public static function all($filter = null)
     {
         $params = [];
@@ -55,4 +45,4 @@ class SalesQuotes
 
         return collect($response->json()['value']);
     }
-} 
+}

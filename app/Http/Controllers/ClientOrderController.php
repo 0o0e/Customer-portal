@@ -12,13 +12,16 @@ class ClientOrderController extends Controller
 {
     public function create()
     {
+        // gets the current user 
         $user = Auth::user();
         $customerNo = $user->No;
 
+        
         if (!$customerNo) {
             return back()->with('error', 'No customer number found for your account.');
         }
 
+        
         try {
             // Get selected clients from session, default to current user if none selected
             $selectedClients = session('selected_clients', [$user->No]);
@@ -46,19 +49,25 @@ class ClientOrderController extends Controller
 
     public function store(Request $request)
     {
+        // validate the request, required at least one item and required fields are product id quantity and unit price
         $request->validate([
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required',
             'items.*.quantity' => 'required|numeric|min:0.01',
             'items.*.unit_price' => 'required|numeric|min:0'
         ]);
-
+        
         try {
+            // get the current user
             $user = Auth::user();
+
+            // create empty array for storing quote lines
             $quoteLines = [];
 
+            // loop through each item
             foreach ($request->items as $item) {
-                // Get product details including price
+
+                // get product details from catalog and price from item table
                 $selectedProduct = DB::table('Catalog as c')
                     ->join('item as i', 'c.Item No#', '=', 'i.No')
                     ->where('c.Item No#', $item['product_id'])
@@ -69,14 +78,16 @@ class ClientOrderController extends Controller
                         'i.Unit_Price'
                     )
                     ->first();
-
+                
+                // if not selected product(not found or not available) return an error. but this would not happen because of the validation.
                 if (!$selectedProduct) {
                     return back()->with('error', 'Product not found or not available for your account.');
                 }
 
-                // Convert special characters to their normal form
-                $description = html_entity_decode($selectedProduct->{'Item Description'}, ENT_QUOTES, 'UTF-8');
+                // get the description of the product. this will be used in the quote lin
+                $description = $selectedProduct->{'Item Description'};
                 
+                // add the quote line to the array
                 $quoteLines[] = [
                     'lineType' => 'Item',
                     'description' => $description,

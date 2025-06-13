@@ -382,16 +382,6 @@
                 color: #e2e8f0;
                 font-size: 0.875rem;
             }
-
-            .client-filter-message {
-                margin-top: 0.5rem;
-                padding: 0.5rem;
-                background: rgba(34, 197, 94, 0.1);
-                color: #22c55e;
-                border-radius: 0.25rem;
-                font-size: 0.875rem;
-                text-align: center;
-            }
         </style>
     </head>
     <body>
@@ -453,12 +443,6 @@
                                 </div>
                             @endif
                         </form>
-                        
-                        @if(session('client_filter_message'))
-                            <div class="client-filter-message">
-                                {{ session('client_filter_message') }}
-                            </div>
-                        @endif
                     </div>
                 </div>
 

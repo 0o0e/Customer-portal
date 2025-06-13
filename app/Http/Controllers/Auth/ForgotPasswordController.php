@@ -78,7 +78,7 @@ class ForgotPasswordController extends Controller
             ]);
         }
 
-        // Reset the password
+        // Reset password
         $user->password = Hash::make($request->password);
         $user->remember_token = Str::random(60);
         $user->save();
