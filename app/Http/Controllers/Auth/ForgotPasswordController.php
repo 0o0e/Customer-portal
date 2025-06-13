@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Str;
 use App\Models\User;
+use App\Services\ActivityLogger;
 
 class ForgotPasswordController extends Controller
 {
@@ -82,6 +83,8 @@ class ForgotPasswordController extends Controller
         $user->password = Hash::make($request->password);
         $user->remember_token = Str::random(60);
         $user->save();
+
+        ActivityLogger::logPasswordReset($user, $request);
 
 
 

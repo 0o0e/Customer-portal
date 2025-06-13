@@ -491,6 +491,13 @@
                             Profile
                         </a>
                     </li>
+                    <li>
+                        <a href="/activity-log" class="{{ request()->is('activity-log') ? 'active' : '' }}">
+                            <i class="fas fa-user"></i>
+                            Activity Logs
+                        </a>
+                    </li>
+
 
 
                     @if (Auth::user()->is_admin)

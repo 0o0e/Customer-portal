@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Password;
+use App\Services\ActivityLogger;
 
 class ProfileController extends Controller
 {
@@ -35,6 +36,8 @@ class ProfileController extends Controller
 
         $user->password = Hash::make($request->password);
         $user->save();
+
+        ActivityLogger::logPasswordChange($user, $request);
 
         return back()->with('success', 'Password updated successfully!');
     }

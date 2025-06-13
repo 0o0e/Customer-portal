@@ -16,6 +16,7 @@ use App\Http\Controllers\BusinessCentralController;
 use App\Http\Controllers\ClientOrderController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\UserActivityController;
 Route::get('/', function () {
     return view('welcome');
 });
@@ -49,6 +50,9 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
     Route::post('/profile/update-password', [ProfileController::class, 'updatePassword'])->name('profile.update-password');
+
+    // User Activity Log Routes
+    Route::get('/activity-log', [UserActivityController::class, 'index'])->name('activity-log.index');
 
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 

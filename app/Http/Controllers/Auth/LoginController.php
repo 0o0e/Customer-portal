@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Services\ActivityLogger;
 
 class LoginController extends Controller
 {
@@ -25,8 +26,18 @@ class LoginController extends Controller
         ]);
 
         if (Auth::attempt($credentials)) {
+            ActivityLogger::logLogin(Auth::user(), $request, true);
             return redirect()->intended('/dashboard');
         }
+
+        $user = \App\Models\User::where('name', $credentials['name'])
+            ->where('No', $credentials['No'])
+            ->first();
+
+        if($user){
+            ActivityLogger::logLogin($user, $request, false);
+        }
+
 
         return back()->withErrors(['login' => 'Invalid login details']);
     }
