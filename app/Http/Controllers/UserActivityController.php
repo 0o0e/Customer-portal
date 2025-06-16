@@ -15,12 +15,12 @@ class UserActivityController extends Controller
         
         $query = $user->activities()->orderBy('created_at', 'desc');
         
-        // Filter by activity type
+        // by activity type
         if ($request->filled('activity_type')) {
             $query->where('activity_type', $request->activity_type);
         }
         
-        // Filter by date range
+        // date range
         if ($request->filled('date_from')) {
             $query->whereDate('created_at', '>=', $request->date_from);
         }
@@ -29,14 +29,14 @@ class UserActivityController extends Controller
             $query->whereDate('created_at', '<=', $request->date_to);
         }
         
-        // Search in description
+        // description
         if ($request->filled('search')) {
             $query->where('description', 'like', '%' . $request->search . '%');
         }
         
         $activities = $query->paginate(20);
         
-        // Get activity types for filter dropdown
+        // getting the activity types
         $activityTypes = UserActivity::where('user_id', $user->id)
             ->distinct()
             ->pluck('activity_type');

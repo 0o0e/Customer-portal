@@ -8,8 +8,10 @@ class SalesQuotes
 {
     // protected $baseUrl = 'salesQuotes';
 
+    //
     public static function find($id)
     {
+        // get quote from business central
         $response = Http::businessCentral()->get("salesQuotes($id)", [
             '$expand' => 'salesQuoteLines'
         ]);
@@ -17,6 +19,7 @@ class SalesQuotes
         if (!$response->successful()) {
             return null;
         }
+
 
         return $response->json();
     }

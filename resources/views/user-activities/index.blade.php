@@ -5,9 +5,6 @@
 @section('content')
 <div class="header">
     <h1><i class="fas fa-history"></i> Account Activity Log</h1>
-    <div class="user-profile">
-        <span class="text-gray-600">Monitor your account activity for security</span>
-    </div>
 </div>
 
 <div class="activity-log-container">
@@ -105,13 +102,9 @@
                                         <span class="status-badge status-failed">
                                             <i class="fas fa-times"></i> Failed
                                         </span>
-                                    @elseif($activity->activity_type === 'login')
+                                    @elseif($activity->activity_type === 'login' || $activity->activity_type === 'password_change' || $activity->activity_type === 'logout')
                                         <span class="status-badge status-success">
                                             <i class="fas fa-check"></i> Success
-                                        </span>
-                                    @else
-                                        <span class="status-badge status-info">
-                                            <i class="fas fa-info"></i> Info
                                         </span>
                                     @endif
                                 </td>
