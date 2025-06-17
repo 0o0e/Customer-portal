@@ -84,10 +84,10 @@ class ClientOrderController extends Controller
                     return back()->with('error', 'Product not found or not available for your account.');
                 }
 
-                // get the description of the product. this will be used in the quote lin
+                // get the description of the product. this will be used in the detail page
                 $description = $selectedProduct->{'Item Description'};
                 
-                // add the quote line to the array
+                // add the quote line to the array 
                 $quoteLines[] = [
                     'lineType' => 'Item',
                     'description' => $description,
@@ -96,6 +96,9 @@ class ClientOrderController extends Controller
                 ];
             }
 
+
+            
+            // all the data to send to business central
             $quoteData = [
                 'customerNumber' => $selectedProduct->{'Customer No#'},
                 'shipToName' => $user->name,
@@ -103,12 +106,15 @@ class ClientOrderController extends Controller
                 'salesQuoteLines' => $quoteLines
             ];
 
+            // sends data to business central
             $response = SalesQuotes::create($quoteData);
 
+            // if it wasnt a successful creation return error
             if (!$response->successful()) {
                 return back()->with('error', 'Quote creation failed: ' . $response->json()['error']['message']);
             }
 
+            // redirext to the quotes page
             return redirect()->route('client-orders.index')->with('success', 'Quote created successfully!');
 
         } catch (\Exception $e) {
@@ -116,9 +122,12 @@ class ClientOrderController extends Controller
         }
     }
 
+    // shows list of all quotes
     public function index()
     {
+
         try {
+            // get current user and selected clients from session default to current user No if theres no selecetd clients
             $user = Auth::user();
             $selectedClients = session('selected_clients', [$user->No]);
 
@@ -134,6 +143,8 @@ class ClientOrderController extends Controller
         }
     }
 
+    
+    // shows details of one quote
     public function show($id)
     {
         try {

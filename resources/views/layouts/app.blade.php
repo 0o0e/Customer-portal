@@ -493,7 +493,7 @@
                     </li>
                     <li>
                         <a href="/activity-log" class="{{ request()->is('activity-log') ? 'active' : '' }}">
-                            <i class="fas fa-user"></i>
+                            <i class="fas fa-list-alt"></i>
                             Activity Logs
                         </a>
                     </li>

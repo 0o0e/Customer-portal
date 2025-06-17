@@ -9,15 +9,12 @@ use Illuminate\Support\Facades\Auth;
 
 class ActivityLogger
 {
-    /**
-     * Log a user activity.
-     */
+    // log user activity
     public static function log(
         User $user,
         string $activityType,
         string $description,
         ?Request $request = null,
-        array $metadata = []
     ): UserActivity {
         $request = $request ?? request();
         
@@ -29,9 +26,7 @@ class ActivityLogger
         ]);
     }
 
-    /**
-     * Log a login activity.
-     */
+    // log a login activity
     public static function logLogin(User $user, Request $request, bool $successful = true): UserActivity
     {
         $activityType = $successful ? 'login' : 'failed_login';
@@ -40,25 +35,19 @@ class ActivityLogger
         return self::log($user, $activityType, $description, $request);
     }
 
-    /**
-     * Log a logout activity.
-     */
+    // log a logout activity
     public static function logLogout(User $user, Request $request): UserActivity
     {
         return self::log($user, 'logout', 'User logged out', $request);
     }
 
-    /**
-     * Log a password change activity.
-     */
+    // log a password change activity
     public static function logPasswordChange(User $user, Request $request): UserActivity
     {
         return self::log($user, 'password_change', 'Password changed successfully', $request);
     }
 
-    /**
-     * Log a password reset activity.
-     */
+    // log a password reset activity
     public static function logPasswordReset(User $user, Request $request): UserActivity
     {
         return self::log($user, 'password_reset', 'Password reset completed', $request);
