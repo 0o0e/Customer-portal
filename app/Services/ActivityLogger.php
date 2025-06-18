@@ -22,7 +22,6 @@ class ActivityLogger
             'user_id' => $user->id,
             'activity_type' => $activityType,
             'description' => $description,
-            'ip_address' => $request->ip(),
         ]);
     }
 

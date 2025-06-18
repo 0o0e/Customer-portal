@@ -64,7 +64,6 @@
                         <tr>
                             <th>Activity</th>
                             <th>Description</th>
-                            <th>IP Address</th>
                             <th>Date & Time</th>
                             <th>Status</th>
                         </tr>
@@ -87,9 +86,6 @@
                                             </span>
                                         @endif
                                     </div>
-                                </td>
-                                <td>
-                                    <span class="ip-address">{{ $activity->ip_address ?? 'Unknown' }}</span>
                                 </td>
                                 <td>
                                     <div class="datetime-info">
@@ -285,12 +281,6 @@
     border-radius: 0.25rem;
     font-size: 0.75rem;
     font-weight: 500;
-}
-
-.ip-address {
-    font-family: 'Courier New', monospace;
-    color: #6b7280;
-    font-size: 0.8rem;
 }
 
 .datetime-info {

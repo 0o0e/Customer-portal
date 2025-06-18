@@ -16,8 +16,6 @@ class UserActivity extends Model
         'description',
     ];
 
-
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -35,7 +33,6 @@ class UserActivity extends Model
         };
     }
 
- 
     public function getActivityIcon(): string
     {
         return match($this->activity_type) {
@@ -48,22 +45,8 @@ class UserActivity extends Model
         };
     }
 
-
     public function isSuspicious(): bool
     {
-        return $this->activity_type === 'failed_login' || 
-               $this->activity_type === 'login' && $this->isUnusualLogin();
-    }
-
-    private function isUnusualLogin(): bool
-    {
-        // This is a simplified check - in production, you might want more sophisticated logic
-        $recentActivities = static::where('user_id', $this->user_id)
-            ->where('activity_type', 'login')
-            ->where('created_at', '>', now()->subDays(30))
-            ->pluck('ip_address')
-            ->unique();
-
-        return !$recentActivities->contains($this->ip_address);
+        return $this->activity_type === 'failed_login';
     }
 }
