@@ -20,13 +20,21 @@ class UserActivityController extends Controller
             $query->where('activity_type', $request->activity_type);
         }
         
-        // date range
-        if ($request->filled('date_from')) {
-            $query->whereDate('created_at', '>=', $request->date_from);
+        // date range validation
+        $dateFrom = $request->filled('date_from') ? $request->date_from : null;
+        $dateTo = $request->filled('date_to') ? $request->date_to : null;
+        
+        if ($dateFrom && $dateTo && $dateFrom > $dateTo) {
+            return back()->withErrors(['date_range' => '"from date" cannot be after "to date".']);
         }
         
-        if ($request->filled('date_to')) {
-            $query->whereDate('created_at', '<=', $request->date_to);
+        // Apply date filters
+        if ($dateFrom) {
+            $query->whereDate('created_at', '>=', $dateFrom);
+        }
+        
+        if ($dateTo) {
+            $query->whereDate('created_at', '<=', $dateTo);
         }
         
         // description

@@ -7,6 +7,17 @@
     <h1><i class="fas fa-history"></i> Account Activity Log</h1>
 </div>
 
+@if ($errors->any())
+    <div class="alert alert-error">
+        <i class="fas fa-exclamation-circle"></i>
+        <div>
+            @foreach ($errors->all() as $error)
+                <p>{{ $error }}</p>
+            @endforeach
+        </div>
+    </div>
+@endif
+
 <div class="activity-log-container">
     <!-- Filters Section -->
     <div class="filters-section">
@@ -125,6 +136,21 @@
 </div>
 
 <style>
+.alert {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.alert-error {
+    background: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
 .activity-log-container {
     background: white;
     border-radius: 0.75rem;
