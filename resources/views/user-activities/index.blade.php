@@ -122,8 +122,13 @@
             </div>
 
             <!-- Pagination -->
-            <div class="pagination-container">
-                {{ $activities->appends(request()->query())->links() }}
+            <div class="pagination-wrapper">
+                <div class="pagination-summary">
+                    Showing {{ $activities->firstItem() }} to {{ $activities->lastItem() }} of {{ $activities->total() }} results
+                </div>
+                <div class="pagination-container">
+                    {{ $activities->appends(request()->query())->links('pagination::bootstrap-4') }}
+                </div>
             </div>
         @else
             <div class="no-activities">
@@ -350,11 +355,70 @@
     color: #1e40af;
 }
 
-.pagination-container {
+.pagination-wrapper {
     margin-top: 1.5rem;
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
 }
+
+.pagination-summary {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.pagination-container .pagination {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.pagination-container .page-item .page-link {
+    padding: 0.5rem 1rem;
+    color: #3b82f6;
+    text-decoration: none;
+    border: 1px solid #e5e7eb;
+    background: white;
+    transition: all 0.2s;
+    display: block;
+    margin-left: -1px;
+}
+
+.pagination-container .page-item:first-child .page-link {
+    border-top-left-radius: 0.5rem;
+    border-bottom-left-radius: 0.5rem;
+    margin-left: 0;
+}
+
+.pagination-container .page-item:last-child .page-link {
+    border-top-right-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+}
+
+.pagination-container .page-item a.page-link:hover {
+    background: #f3f4f6;
+    color: #1d4ed8;
+}
+
+.pagination-container .page-item.active .page-link {
+    background: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+    z-index: 1;
+    position: relative;
+}
+
+.pagination-container .page-item.disabled .page-link {
+    color: #9ca3af;
+    background: #f9fafb;
+    pointer-events: none;
+}
+
 
 .no-activities {
     text-align: center;
