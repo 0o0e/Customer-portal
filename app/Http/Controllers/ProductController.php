@@ -91,7 +91,6 @@ class ProductController extends Controller
         ]);
 
         session(['selected_clients' => $selectedClients]);
-        session(['client_filter_message' => 'Client filter applied successfully!']);
 
         return redirect()->back();
     }
@@ -100,6 +99,7 @@ class ProductController extends Controller
     {
         return view('products.request');
     }
+    
     public function storeRequest(Request $request)
     {
         try {

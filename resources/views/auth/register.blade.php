@@ -94,6 +94,12 @@
 
 <div class="register-container">
     <h2>Register New User</h2>
+    
+    <div style="background: #e3f2fd; padding: 15px; border-radius: 5px; margin-bottom: 20px; border-left: 4px solid #2196f3;">
+        <p style="margin: 0; color: #1976d2; font-size: 14px;">
+            <strong>Note:</strong> A unique client number will be automatically generated and sent to the user's email along with their login credentials.
+        </p>
+    </div>
 
     @if ($errors->any())
         <div class="error-message">
@@ -119,11 +125,6 @@
         <div class="form-group">
             <label>Email:</label>
             <input type="email" name="email" value="{{ old('email') }}" required>
-        </div>
-
-        <div class="form-group">
-            <label>Client Number:</label>
-            <input type="text" name="No" value="{{ old('No') }}" required>
         </div>
 
         <button type="submit">Register User</button>

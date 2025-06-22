@@ -41,4 +41,5 @@ class Catalog extends Model
 
         return $query->get();
     }
+    
 }

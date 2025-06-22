@@ -22,15 +22,20 @@ class RegisterController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'No' => 'required|string|max:255|unique:users',
         ]);
+
+        // Generate random client number
+        do {
+            $clientNo = 'K' . str_pad(random_int(1, 999999), 6, '0', STR_PAD_LEFT);
+            $exists = User::where('No', $clientNo)->exists();
+        } while ($exists);
 
         $password = Str::random(10);
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($password),
-            'No' => $request->No,
+            'No' => $clientNo,
             'is_admin' => false,
         ]);
 
