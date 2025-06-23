@@ -170,6 +170,29 @@
 <div class="orders-container">
     <h1 class="page-title">Orders List</h1>
 
+    <form id="filterForm" method="GET" action="">
+        <div>
+            <label for="date_from">From Date</label>
+            <input type="date" name="date_from" id="date_from" class="form-control" value="{{ request('date_from') }}">
+        </div>
+        <div>
+            <label for="date_to">To Date</label>
+            <input type="date" name="date_to" id="date_to" class="form-control" value="{{ request('date_to') }}">
+        </div>
+        <div>
+            <label for="quantity_min">Min Quantity</label>
+            <input type="number" step="0.01" name="quantity_min" id="quantity_min" class="form-control" value="{{ request('quantity_min') }}">
+        </div>
+        <div>
+            <label for="quantity_max">Max Quantity</label>
+            <input type="number" step="0.01" name="quantity_max" id="quantity_max" class="form-control" value="{{ request('quantity_max') }}">
+        </div>
+        <div>
+            <button type="submit" class="btn btn-primary">Filter</button>
+            <a href="{{ route('orders.index') }}" class="btn btn-secondary" style="margin-left: 0.5rem;">Clear Filters</a>
+        </div>
+    </form>
+
     @if($orders->isEmpty())
         <p>No orders found.</p>
     @else
