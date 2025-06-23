@@ -165,33 +165,113 @@
             border-radius: 0;
         }
     }
+    .filters-section {
+    padding: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    background: #f9fafb;
+}
+.filters-section {
+    padding: 1rem;
+    border-bottom: 1px solid #edf2f7;
+    background: #f7fafc;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+}
+
+.filters-form {
+    width: 100%;
+}
+
+.filters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    align-items: end;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.filter-group label {
+    font-weight: 500;
+    color: #4a5568;
+    font-size: 0.875rem;
+}
+
+.filter-group input {
+    padding: 0.5rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    font-size: 0.875rem;
+}
+
+.filter-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: end;
+}
+
+.filter-actions .view-link {
+    background: #4299e1;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    text-decoration: none;
+    text-align: center;
+    white-space: nowrap;
+    font-size: 0.875rem;
+    transition: background 0.2s;
+}
+
+.filter-actions .view-link:hover {
+    background: #3182ce;
+}
+
 </style>
 
 <div class="orders-container">
     <h1 class="page-title">Orders List</h1>
 
-    <form id="filterForm" method="GET" action="">
-        <div>
-            <label for="date_from">From Date</label>
-            <input type="date" name="date_from" id="date_from" class="form-control" value="{{ request('date_from') }}">
-        </div>
-        <div>
-            <label for="date_to">To Date</label>
-            <input type="date" name="date_to" id="date_to" class="form-control" value="{{ request('date_to') }}">
-        </div>
-        <div>
-            <label for="quantity_min">Min Quantity</label>
-            <input type="number" step="0.01" name="quantity_min" id="quantity_min" class="form-control" value="{{ request('quantity_min') }}">
-        </div>
-        <div>
-            <label for="quantity_max">Max Quantity</label>
-            <input type="number" step="0.01" name="quantity_max" id="quantity_max" class="form-control" value="{{ request('quantity_max') }}">
-        </div>
-        <div>
-            <button type="submit" class="btn btn-primary">Filter</button>
-            <a href="{{ route('orders.index') }}" class="btn btn-secondary" style="margin-left: 0.5rem;">Clear Filters</a>
+    <div class="filters-section">
+    <form id="filterForm" method="GET" action="" class="filters-form">
+        <div class="filters-grid">
+            <div class="filter-group">
+                <label for="date_from">From Date</label>
+                <input type="date" name="date_from" id="date_from" class="form-control" value="{{ request('date_from') }}">
+            </div>
+
+            <div class="filter-group">
+                <label for="date_to">To Date</label>
+                <input type="date" name="date_to" id="date_to" class="form-control" value="{{ request('date_to') }}">
+            </div>
+
+            <div class="filter-group">
+                <label for="quantity_min">Min Quantity</label>
+                <input type="number" step="0.01" name="quantity_min" id="quantity_min" class="form-control" value="{{ request('quantity_min') }}">
+            </div>
+
+            <div class="filter-group">
+                <label for="quantity_max">Max Quantity</label>
+                <input type="number" step="0.01" name="quantity_max" id="quantity_max" class="form-control" value="{{ request('quantity_max') }}">
+            </div>
+
+            <div class="filter-actions">
+                
+                <button type="submit" class="view-link">
+                <i class="fas fa-search"></i> Filter
+
+                </button>
+                <a href="{{ route('orders.index') }}" class="view-link" style="background: #e2e8f0; color: #2d3748;">
+                <i class="fas fa-times"></i> Clear
+                </a>
+            </div>
         </div>
     </form>
+</div>
+
 
     @if($orders->isEmpty())
         <p>No orders found.</p>
