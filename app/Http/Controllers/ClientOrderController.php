@@ -79,7 +79,7 @@ class ClientOrderController extends Controller
                     )
                     ->first();
                 
-                // if not selected product(not found or not available) return an error. but this would not happen because of the validation.
+                // if not selected product(not found or not available) return an error.
                 if (!$selectedProduct) {
                     return back()->with('error', 'Product not found or not available for your account.');
                 }

@@ -175,38 +175,30 @@
                         <select name="items[0][product_id]" class="form-control product-select" required>
                             <option value="">Select a product</option>
                             @foreach($customerProducts as $product)
-                                <option value="{{ $product->{'Item No#'} }}" 
-                                        data-price="{{ $product->Unit_Price }}">
+                                <option value="{{ $product->{'Item No#'} }}" data-price="{{ $product->Unit_Price }}">
                                     {{ $product->{'Item Description'} }}
                                 </option>
                             @endforeach
                         </select>
-                        <div class="unit-price"></div>
                     </div>
-
                     <div class="form-group">
                         <label class="form-label">Quantity</label>
                         <input type="number" name="items[0][quantity]" class="form-control" min="1" step="0.01" required>
                     </div>
-
                     <div class="form-group">
                         <label class="form-label">Unit Price</label>
                         <input type="text" class="form-control unit-price-display" readonly>
                         <input type="hidden" name="items[0][unit_price]" class="unit-price-input">
                     </div>
-
                     <div class="form-group">
                         <label class="form-label">Amount</label>
                         <input type="text" class="form-control line-amount" readonly>
                     </div>
-
                     <button type="button" class="remove-item" style="display: none;">×</button>
                 </div>
             </div>
-
             <button type="button" class="add-item">Add Another Item</button>
         </div>
-
         <div class="btn-group">
             <button type="submit" class="btn btn-primary">Create Quote</button>
             <a href="{{ route('client-orders.index') }}" class="btn btn-secondary">Cancel</a>

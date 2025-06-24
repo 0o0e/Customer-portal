@@ -15,7 +15,7 @@ class UserActivityController extends Controller
         
         $query = $user->activities()->orderBy('created_at', 'desc');
         
-        // by activity type
+        // filter by activity type
         if ($request->filled('activity_type')) {
             $query->where('activity_type', $request->activity_type);
         }
