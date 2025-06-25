@@ -123,9 +123,8 @@ class ClientOrderController extends Controller
     }
 
     // shows list of all quotes
-    public function index()
+    public function index(Request $request)
     {
-
         try {
             // get current user and selected clients from session default to current user No if theres no selecetd clients
             $user = Auth::user();
@@ -134,7 +133,61 @@ class ClientOrderController extends Controller
             // Get all quotes for selected clients
             $quotes = [];
             foreach ($selectedClients as $clientNo) {
-                $quotes = array_merge($quotes, SalesQuotes::all("customerNumber eq '$clientNo'")->toArray());
+                $clientQuotes = SalesQuotes::all("customerNumber eq '$clientNo'")->toArray();
+                $quotes = array_merge($quotes, $clientQuotes);
+            }
+
+            // Apply filters
+            $dateFrom = $request->query('date_from');
+            $dateTo = $request->query('date_to');
+            $quantityMin = $request->query('quantity_min');
+            $quantityMax = $request->query('quantity_max');
+
+            if (!empty($quotes)) {
+                // Filter by date range
+                if ($dateFrom) {
+                    $quotes = array_filter($quotes, function($quote) use ($dateFrom) {
+                        return isset($quote['documentDate']) && $quote['documentDate'] >= $dateFrom;
+                    });
+                }
+
+                if ($dateTo) {
+                    $quotes = array_filter($quotes, function($quote) use ($dateTo) {
+                        return isset($quote['documentDate']) && $quote['documentDate'] <= $dateTo;
+                    });
+                }
+
+                // Filter by quantity range
+                if ($quantityMin !== null && $quantityMin !== '') {
+                    $quotes = array_filter($quotes, function($quote) use ($quantityMin) {
+                        $totalQuantity = 0;
+                        if (isset($quote['salesQuoteLines']) && is_array($quote['salesQuoteLines'])) {
+                            foreach ($quote['salesQuoteLines'] as $line) {
+                                $totalQuantity += isset($line['quantity']) ? (float)$line['quantity'] : 0;
+                            }
+                        }
+                        return $totalQuantity >= (float)$quantityMin;
+                    });
+                }
+
+                if ($quantityMax !== null && $quantityMax !== '') {
+                    $quotes = array_filter($quotes, function($quote) use ($quantityMax) {
+                        $totalQuantity = 0;
+                        if (isset($quote['salesQuoteLines']) && is_array($quote['salesQuoteLines'])) {
+                            foreach ($quote['salesQuoteLines'] as $line) {
+                                $totalQuantity += isset($line['quantity']) ? (float)$line['quantity'] : 0;
+                            }
+                        }
+                        return $totalQuantity <= (float)$quantityMax;
+                    });
+                }
+
+                // Sort by document date (newest first)
+                usort($quotes, function($a, $b) {
+                    $dateA = $a['documentDate'] ?? '';
+                    $dateB = $b['documentDate'] ?? '';
+                    return strcmp($dateB, $dateA);
+                });
             }
 
             return view('client-orders.index', compact('quotes'));

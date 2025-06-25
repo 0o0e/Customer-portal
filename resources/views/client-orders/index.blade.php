@@ -22,6 +22,77 @@
         text-align: center;
     }
 
+    .filters-section {
+        padding: 1rem;
+        border-bottom: 1px solid #edf2f7;
+        background: #f7fafc;
+        border-radius: 6px;
+        margin-bottom: 1rem;
+    }
+
+    .filters-form {
+        width: 100%;
+    }
+
+    .filters-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        align-items: end;
+    }
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .filter-group label {
+        font-weight: 500;
+        color: #4a5568;
+        font-size: 0.875rem;
+    }
+
+    .filter-group input {
+        padding: 0.5rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 4px;
+        font-size: 0.875rem;
+    }
+
+    .filter-actions {
+        display: flex;
+        gap: 0.5rem;
+        align-items: end;
+    }
+
+    .filter-actions .btn {
+        background: #4299e1;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        text-decoration: none;
+        text-align: center;
+        white-space: nowrap;
+        font-size: 0.875rem;
+        transition: background 0.2s;
+        border: none;
+        cursor: pointer;
+    }
+
+    .filter-actions .btn:hover {
+        background: #3182ce;
+    }
+
+    .filter-actions .btn-clear {
+        background: #e2e8f0;
+        color: #2d3748;
+    }
+
+    .filter-actions .btn-clear:hover {
+        background: #cbd5e0;
+    }
+
     .table-wrapper {
         width: 100%;
         overflow-x: auto;
@@ -154,6 +225,41 @@
         </div>
     @endif
 
+    <div class="filters-section">
+        <form id="filterForm" method="GET" action="{{ route('client-orders.index') }}" class="filters-form">
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label for="date_from">From Date</label>
+                    <input type="date" name="date_from" id="date_from" class="form-control" value="{{ request('date_from') }}">
+                </div>
+
+                <div class="filter-group">
+                    <label for="date_to">To Date</label>
+                    <input type="date" name="date_to" id="date_to" class="form-control" value="{{ request('date_to') }}">
+                </div>
+
+                <div class="filter-group">
+                    <label for="quantity_min">Min Quantity</label>
+                    <input type="number" step="0.01" name="quantity_min" id="quantity_min" class="form-control" value="{{ request('quantity_min') }}">
+                </div>
+
+                <div class="filter-group">
+                    <label for="quantity_max">Max Quantity</label>
+                    <input type="number" step="0.01" name="quantity_max" id="quantity_max" class="form-control" value="{{ request('quantity_max') }}">
+                </div>
+
+                <div class="filter-actions">
+                    <button type="submit" class="btn">
+                        <i class="fas fa-search"></i> Filter
+                    </button>
+                    <a href="{{ route('client-orders.index') }}" class="btn btn-clear">
+                        <i class="fas fa-times"></i> Clear
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
     @if(empty($quotes))
         <p>No quotes found.</p>
     @else
@@ -165,7 +271,7 @@
                         <th>Customer</th>
                         <th>Document Date</th>
                         <th>Status</th>
-                        <th>Quantity</th>
+                        <th>Total Quantity</th>
                         <th>Amount</th>
                         <th></th>
                     </tr>
@@ -177,7 +283,17 @@
                             <td>{{ $quote['customerName'] }}</td>
                             <td class="date-cell">{{ $quote['documentDate'] }}</td>
                             <td>{{ $quote['status'] }}</td>
-                            <td class="numeric-cell">{{ $quote['salesQuoteLines'][0]['quantity'] ?? 0 }}</td>
+                            <td class="numeric-cell">
+                                @php
+                                    $totalQuantity = 0;
+                                    if (isset($quote['salesQuoteLines']) && is_array($quote['salesQuoteLines'])) {
+                                        foreach ($quote['salesQuoteLines'] as $line) {
+                                            $totalQuantity += isset($line['quantity']) ? (float)$line['quantity'] : 0;
+                                        }
+                                    }
+                                @endphp
+                                {{ number_format($totalQuantity, 2) }}
+                            </td>
                             <td class="numeric-cell">{{ number_format($quote['totalAmountIncludingTax'], 2) }}</td>
                             <td>
                                 <a href="{{ route('client-orders.show', $quote['id']) }}" class="view-link">View Details</a>
@@ -189,4 +305,4 @@
         </div>
     @endif
 </div>
-@endsection 
+@endsection
