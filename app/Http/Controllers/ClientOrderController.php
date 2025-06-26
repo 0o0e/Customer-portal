@@ -142,8 +142,42 @@ class ClientOrderController extends Controller
             $dateTo = $request->query('date_to');
             $quantityMin = $request->query('quantity_min');
             $quantityMax = $request->query('quantity_max');
+            $search = $request->query('search');
+
 
             if (!empty($quotes)) {
+
+
+                // Filter by search term (search in quote number, customer name, description)
+                if ($search) {
+                    $quotes = array_filter($quotes, function($quote) use ($search) {
+                        $searchTerm = strtolower($search);
+                        
+                        // Search in quote number
+                        if (stripos($quote['number'], $searchTerm) !== false) {
+                            return true;
+                        }
+                        
+                        // Search in customer name
+                        if (stripos($quote['customerName'], $searchTerm) !== false) {
+                            return true;
+                        }
+                        
+                        // Search in quote lines descriptions
+                        if (isset($quote['salesQuoteLines']) && is_array($quote['salesQuoteLines'])) {
+                            foreach ($quote['salesQuoteLines'] as $line) {
+                                if (isset($line['description']) && stripos($line['description'], $searchTerm) !== false) {
+                                    return true;
+                                }
+                            }
+                        }
+                        
+                        return false;
+                    });
+                }
+
+
+
                 // Filter by date range
                 if ($dateFrom) {
                     $quotes = array_filter($quotes, function($quote) use ($dateFrom) {

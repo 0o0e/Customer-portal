@@ -228,6 +228,7 @@
     <div class="filters-section">
         <form id="filterForm" method="GET" action="{{ route('client-orders.index') }}" class="filters-form">
             <div class="filters-grid">
+                
                 <div class="filter-group">
                     <label for="date_from">From Date</label>
                     <input type="date" name="date_from" id="date_from" class="form-control" value="{{ request('date_from') }}">
