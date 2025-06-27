@@ -49,25 +49,25 @@ class ClientOrderController extends Controller
 
     public function store(Request $request)
     {
-        // validate the request, required at least one item and required fields are product id quantity and unit price
-        $request->validate([
+        // Validate the request with proper Laravel validation
+        $validatedData = $request->validate([
             'items' => 'required|array|min:1',
-            'items.*.product_id' => 'required',
+            'items.*.product_id' => 'required|string',
             'items.*.quantity' => 'required|numeric|min:0.01',
             'items.*.unit_price' => 'required|numeric|min:0'
         ]);
         
         try {
-            // get the current user
+            // Get the current user
             $user = Auth::user();
 
-            // create empty array for storing quote lines
+            // Create empty array for storing quote lines
             $quoteLines = [];
+            $customerNo = null;
 
-            // loop through each item
-            foreach ($request->items as $item) {
-
-                // get product details from catalog and price from item table
+            // Loop through each validated item
+            foreach ($validatedData['items'] as $item) {
+                // Get product details from catalog and price from item table
                 $selectedProduct = DB::table('Catalog as c')
                     ->join('item as i', 'c.Item No#', '=', 'i.No')
                     ->where('c.Item No#', $item['product_id'])
@@ -79,15 +79,22 @@ class ClientOrderController extends Controller
                     )
                     ->first();
                 
-                // if not selected product(not found or not available) return an error.
+                // If product not found, return error with old input
                 if (!$selectedProduct) {
-                    return back()->with('error', 'Product not found or not available for your account.');
+                    return back()
+                        ->withInput()
+                        ->with('error', 'Product not found or not available for your account.');
                 }
 
-                // get the description of the product. this will be used in the detail page
+                // Store customer number from first product
+                if (!$customerNo) {
+                    $customerNo = $selectedProduct->{'Customer No#'};
+                }
+
+                // Get the description of the product
                 $description = $selectedProduct->{'Item Description'};
                 
-                // add the quote line to the array 
+                // Add the quote line to the array 
                 $quoteLines[] = [
                     'lineType' => 'Item',
                     'description' => $description,
@@ -96,29 +103,37 @@ class ClientOrderController extends Controller
                 ];
             }
 
-
-            
-            // all the data to send to business central
+            // Prepare data to send to business central
             $quoteData = [
-                'customerNumber' => $selectedProduct->{'Customer No#'},
+                'customerNumber' => $customerNo,
                 'shipToName' => $user->name,
                 'externalDocumentNumber' => '123',
                 'salesQuoteLines' => $quoteLines
             ];
 
-            // sends data to business central
+            // Send data to business central
             $response = SalesQuotes::create($quoteData);
 
-            // if it wasnt a successful creation return error
+            // Check if creation was successful
             if (!$response->successful()) {
-                return back()->with('error', 'Quote creation failed: ' . $response->json()['error']['message']);
+                $errorMessage = 'Quote creation failed.';
+                if ($response->json() && isset($response->json()['error']['message'])) {
+                    $errorMessage .= ' ' . $response->json()['error']['message'];
+                }
+                return back()->withInput()->with('error', $errorMessage);
             }
 
-            // redirext to the quotes page
-            return redirect()->route('client-orders.index')->with('success', 'Quote created successfully!');
+            // Redirect to the quotes page with success message
+            return redirect()->route('client-orders.index')
+                ->with('success', 'Quote created successfully!');
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Could not create quote: ' . $e->getMessage());
+            // Log the error for debugging
+            \Log::error('Quote creation failed: ' . $e->getMessage());
+            
+            return back()
+                ->withInput()
+                ->with('error', 'Could not create quote. Please try again.');
         }
     }
 
