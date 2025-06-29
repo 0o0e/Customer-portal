@@ -18,8 +18,9 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\UserActivityController;
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('dashboard');
 });
+
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');

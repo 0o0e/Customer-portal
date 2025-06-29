@@ -49,25 +49,25 @@ class ClientOrderController extends Controller
 
     public function store(Request $request)
     {
-        // validate the request, required at least one item and required fields are product id quantity and unit price
-        $request->validate([
+        // Validate the request with proper Laravel validation
+        $validatedData = $request->validate([
             'items' => 'required|array|min:1',
-            'items.*.product_id' => 'required',
+            'items.*.product_id' => 'required|string',
             'items.*.quantity' => 'required|numeric|min:0.01',
             'items.*.unit_price' => 'required|numeric|min:0'
         ]);
         
         try {
-            // get the current user
+            // Get the current user
             $user = Auth::user();
 
-            // create empty array for storing quote lines
+            // Create empty array for storing quote lines
             $quoteLines = [];
+            $customerNo = null;
 
-            // loop through each item
-            foreach ($request->items as $item) {
-
-                // get product details from catalog and price from item table
+            // Loop through each validated item
+            foreach ($validatedData['items'] as $item) {
+                // Get product details from catalog and price from item table
                 $selectedProduct = DB::table('Catalog as c')
                     ->join('item as i', 'c.Item No#', '=', 'i.No')
                     ->where('c.Item No#', $item['product_id'])
@@ -79,15 +79,22 @@ class ClientOrderController extends Controller
                     )
                     ->first();
                 
-                // if not selected product(not found or not available) return an error. but this would not happen because of the validation.
+                // If product not found, return error with old input
                 if (!$selectedProduct) {
-                    return back()->with('error', 'Product not found or not available for your account.');
+                    return back()
+                        ->withInput()
+                        ->with('error', 'Product not found or not available for your account.');
                 }
 
-                // get the description of the product. this will be used in the detail page
+                // Store customer number from first product
+                if (!$customerNo) {
+                    $customerNo = $selectedProduct->{'Customer No#'};
+                }
+
+                // Get the description of the product
                 $description = $selectedProduct->{'Item Description'};
                 
-                // add the quote line to the array 
+                // Add the quote line to the array 
                 $quoteLines[] = [
                     'lineType' => 'Item',
                     'description' => $description,
@@ -96,36 +103,43 @@ class ClientOrderController extends Controller
                 ];
             }
 
-
-            
-            // all the data to send to business central
+            // Prepare data to send to business central
             $quoteData = [
-                'customerNumber' => $selectedProduct->{'Customer No#'},
+                'customerNumber' => $customerNo,
                 'shipToName' => $user->name,
                 'externalDocumentNumber' => '123',
                 'salesQuoteLines' => $quoteLines
             ];
 
-            // sends data to business central
+            // Send data to business central
             $response = SalesQuotes::create($quoteData);
 
-            // if it wasnt a successful creation return error
+            // Check if creation was successful
             if (!$response->successful()) {
-                return back()->with('error', 'Quote creation failed: ' . $response->json()['error']['message']);
+                $errorMessage = 'Quote creation failed.';
+                if ($response->json() && isset($response->json()['error']['message'])) {
+                    $errorMessage .= ' ' . $response->json()['error']['message'];
+                }
+                return back()->withInput()->with('error', $errorMessage);
             }
 
-            // redirext to the quotes page
-            return redirect()->route('client-orders.index')->with('success', 'Quote created successfully!');
+            // Redirect to the quotes page with success message
+            return redirect()->route('client-orders.index')
+                ->with('success', 'Quote created successfully!');
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Could not create quote: ' . $e->getMessage());
+            // Log the error for debugging
+            \Log::error('Quote creation failed: ' . $e->getMessage());
+            
+            return back()
+                ->withInput()
+                ->with('error', 'Could not create quote. Please try again.');
         }
     }
 
     // shows list of all quotes
-    public function index()
+    public function index(Request $request)
     {
-
         try {
             // get current user and selected clients from session default to current user No if theres no selecetd clients
             $user = Auth::user();
@@ -134,7 +148,95 @@ class ClientOrderController extends Controller
             // Get all quotes for selected clients
             $quotes = [];
             foreach ($selectedClients as $clientNo) {
-                $quotes = array_merge($quotes, SalesQuotes::all("customerNumber eq '$clientNo'")->toArray());
+                $clientQuotes = SalesQuotes::all("customerNumber eq '$clientNo'")->toArray();
+                $quotes = array_merge($quotes, $clientQuotes);
+            }
+
+            // Apply filters
+            $dateFrom = $request->query('date_from');
+            $dateTo = $request->query('date_to');
+            $quantityMin = $request->query('quantity_min');
+            $quantityMax = $request->query('quantity_max');
+            $search = $request->query('search');
+
+
+            if (!empty($quotes)) {
+
+
+                // Filter by search term (search in quote number, customer name, description)
+                if ($search) {
+                    $quotes = array_filter($quotes, function($quote) use ($search) {
+                        $searchTerm = strtolower($search);
+                        
+                        // Search in quote number
+                        if (stripos($quote['number'], $searchTerm) !== false) {
+                            return true;
+                        }
+                        
+                        // Search in customer name
+                        if (stripos($quote['customerName'], $searchTerm) !== false) {
+                            return true;
+                        }
+                        
+                        // Search in quote lines descriptions
+                        if (isset($quote['salesQuoteLines']) && is_array($quote['salesQuoteLines'])) {
+                            foreach ($quote['salesQuoteLines'] as $line) {
+                                if (isset($line['description']) && stripos($line['description'], $searchTerm) !== false) {
+                                    return true;
+                                }
+                            }
+                        }
+                        
+                        return false;
+                    });
+                }
+
+
+
+                // Filter by date range
+                if ($dateFrom) {
+                    $quotes = array_filter($quotes, function($quote) use ($dateFrom) {
+                        return isset($quote['documentDate']) && $quote['documentDate'] >= $dateFrom;
+                    });
+                }
+
+                if ($dateTo) {
+                    $quotes = array_filter($quotes, function($quote) use ($dateTo) {
+                        return isset($quote['documentDate']) && $quote['documentDate'] <= $dateTo;
+                    });
+                }
+
+                // Filter by quantity range
+                if ($quantityMin !== null && $quantityMin !== '') {
+                    $quotes = array_filter($quotes, function($quote) use ($quantityMin) {
+                        $totalQuantity = 0;
+                        if (isset($quote['salesQuoteLines']) && is_array($quote['salesQuoteLines'])) {
+                            foreach ($quote['salesQuoteLines'] as $line) {
+                                $totalQuantity += isset($line['quantity']) ? (float)$line['quantity'] : 0;
+                            }
+                        }
+                        return $totalQuantity >= (float)$quantityMin;
+                    });
+                }
+
+                if ($quantityMax !== null && $quantityMax !== '') {
+                    $quotes = array_filter($quotes, function($quote) use ($quantityMax) {
+                        $totalQuantity = 0;
+                        if (isset($quote['salesQuoteLines']) && is_array($quote['salesQuoteLines'])) {
+                            foreach ($quote['salesQuoteLines'] as $line) {
+                                $totalQuantity += isset($line['quantity']) ? (float)$line['quantity'] : 0;
+                            }
+                        }
+                        return $totalQuantity <= (float)$quantityMax;
+                    });
+                }
+
+                // Sort by document date (newest first)
+                usort($quotes, function($a, $b) {
+                    $dateA = $a['documentDate'] ?? '';
+                    $dateB = $b['documentDate'] ?? '';
+                    return strcmp($dateB, $dateA);
+                });
             }
 
             return view('client-orders.index', compact('quotes'));
