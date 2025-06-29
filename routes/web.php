@@ -17,6 +17,7 @@ use App\Http\Controllers\ClientOrderController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\UserActivityController;
+use App\Http\Controllers\AccountRequestController;
 Route::get('/', function () {
     return redirect()->route('dashboard');
 });
@@ -25,6 +26,10 @@ Route::get('/', function () {
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [LoginController::class, 'login']);
+    
+    // Account request routes (public access)
+    Route::get('/account/request', [AccountRequestController::class, 'create'])->name('account.request');
+    Route::post('/account/request', [AccountRequestController::class, 'store'])->name('account.request.store');
     
     Route::get('/forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])
         ->name('password.request');
@@ -79,6 +84,10 @@ Route::middleware('auth')->group(function () {
 Route::middleware('admin')->group(function () {
     Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
     Route::post('/register', [RegisterController::class, 'register']);
+
+    // Account request admin routes
+    Route::post('/account/request/{accountRequest}/approve', [AccountRequestController::class, 'approve'])->name('account.request.approve');
+    Route::post('/account/request/{accountRequest}/reject', [AccountRequestController::class, 'reject'])->name('account.request.reject');
 
     Route::get('admin/reports', [ReportController::class, 'create'])->name('reports.create');
     Route::post('admin/reports', [ReportController::class, 'store'])->name('reports.store');
