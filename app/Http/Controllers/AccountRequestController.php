@@ -24,6 +24,10 @@ class AccountRequestController extends Controller
             'company_name' => 'required|string|max:255',
             'customer_number' => 'required|string|max:50|unique:users,No|unique:account_requests,customer_number',
             'email' => 'required|email|unique:account_requests,email|unique:users,email',
+            'gdpr_consent' => 'required|accepted',
+        ], [
+            'gdpr_consent.required' => 'You must agree to the data protection terms to proceed.',
+            'gdpr_consent.accepted' => 'You must consent to data processing as required by GDPR.',
         ]);
 
         try {
@@ -31,6 +35,9 @@ class AccountRequestController extends Controller
                 'company_name' => $validatedData['company_name'],
                 'customer_number' => $validatedData['customer_number'],
                 'email' => $validatedData['email'],
+                'gdpr_consent' => true,
+                'gdpr_consent_date' => now(),
+                'gdpr_consent_ip' => $request->ip(),
                 'status' => 'pending'
             ]);
 

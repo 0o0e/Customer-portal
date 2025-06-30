@@ -13,6 +13,9 @@ class AccountRequest extends Model
         'company_name',
         'email',
         'customer_number',
+        'gdpr_consent',
+        'gdpr_consent_date',
+        'gdpr_consent_ip',
         'status',
         'notes'
     ];
@@ -20,6 +23,8 @@ class AccountRequest extends Model
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+        'gdpr_consent_date' => 'datetime',
+        'gdpr_consent' => 'boolean',
     ];
 
     // Scope for pending requests

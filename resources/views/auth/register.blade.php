@@ -202,6 +202,7 @@
                             <th>Company Name</th>
                             <th>Customer Number</th>
                             <th>Email</th>
+                            <th>GDPR Consent</th>
                             <th>Request Date</th>
                             <th>Status</th>
                             <th>Actions</th>
@@ -213,6 +214,14 @@
                             <td>{{ $request->company_name }}</td>
                             <td>{{ $request->customer_number }}</td>
                             <td>{{ $request->email }}</td>
+                            <td>
+                                @if($request->gdpr_consent)
+                                    <span style="color: #10b981; font-weight: 600;">✓ Yes</span>
+                                    <br><small style="color: #6b7280;">{{ $request->gdpr_consent_date ? $request->gdpr_consent_date->format('M d, Y H:i') : 'No date' }}</small>
+                                @else
+                                    <span style="color: #ef4444;">✗ No</span>
+                                @endif
+                            </td>
                             <td class="date-cell">{{ $request->created_at->format('M d, Y H:i') }}</td>
                             <td>
                                 <span class="status-badge status-pending">{{ ucfirst($request->status) }}</span>
@@ -249,6 +258,9 @@
             <h3>No Account Requests</h3>
             <p>There are currently no pending account requests to review.</p>
         </div>
+        <tr>
+            <td colspan="7" class="text-center">No account requests found.</td>
+        </tr>
     @endforelse
 </div>
 @endsection
