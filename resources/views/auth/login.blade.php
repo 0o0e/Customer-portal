@@ -90,6 +90,33 @@
             margin: 5px 0;
         }
 
+
+        .request-account-btn:hover {
+            color:rgb(51, 50, 63);
+        }
+
+        .divider {
+            margin: 20px 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .divider::before {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #ddd;
+        }
+
+        .divider span {
+            background: white;
+            padding: 0 15px;
+            color: #666;
+            font-size: 14px;
+        }
+
         @media (max-width: 480px) {
             .login-container {
                 padding: 20px;
@@ -140,6 +167,14 @@
 
         <button type="submit">Login</button>
     </form>
+
+    <div class="divider">
+        <span>Don't have an account?</span>
+    </div>
+
+    <a href="{{ route('account.request') }}" class="request-account-btn">
+        Request New Account
+    </a>
 </div>
 </body>
 </html>

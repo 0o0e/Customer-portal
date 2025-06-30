@@ -263,20 +263,20 @@
 
     @forelse($quotes as $quote)
         @if($loop->first)
-            <div class="table-wrapper">
-                <table class="quotes-table">
-                    <thead>
-                        <tr>
-                            <th>Quote No</th>
-                            <th>Customer</th>
-                            <th>Document Date</th>
-                            <th>Status</th>
+        <div class="table-wrapper">
+            <table class="quotes-table">
+                <thead>
+                    <tr>
+                        <th>Quote No</th>
+                        <th>Customer</th>
+                        <th>Document Date</th>
+                        <th>Status</th>
                             <th>Total Quantity</th>
-                            <th>Amount</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
+                        <th>Amount</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
         @endif
                         <tr>
                             <td>{{ $quote['number'] }}</td>
@@ -300,10 +300,10 @@
                             </td>
                         </tr>
         @if($loop->last)
-                    </tbody>
-                </table>
-            </div>
-        @endif
+                </tbody>
+            </table>
+        </div>
+    @endif
     @empty
         <div class="alert alert-info" style="background: #e0f2fe; color: #0277bd; border: 1px solid #b3e5fc;">
             <i class="fas fa-info-circle"></i>
@@ -311,4 +311,4 @@
         </div>
     @endforelse
 </div>
-@endsection
+@endsection 
